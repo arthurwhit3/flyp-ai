@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Flyp | Assistente Virtual</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div>
+        <div class="brand">Flyp</div>
+        <div class="brand-subtitle">Assistente virtual de ERP</div>
+      </div>
+
+      <button id="novaConversa" class="secondary-btn" type="button">+ Nova conversa</button>
+
+      <div class="sidebar-info">
+        <p>Temas principais:</p>
+        <ul>
+          <li>ERP</li>
+          <li>Postos de combustíveis</li>
+          <li>Varejo</li>
+          <li>Automação comercial</li>
+        </ul>
+      </div>
+    </aside>
+
+    <main class="chat-panel">
+      <header class="chat-header">
+        <div>
+          <h1>Flyp</h1>
+          <p>Atendimento inteligente para apresentação de sistemas ERP</p>
+        </div>
+        <div class="status">
+          <span class="status-dot"></span>
+          Online
+        </div>
+      </header>
+
+      <section id="chat" class="chat-messages">
+        <div class="message bot">
+          <div class="bubble">
+            Olá! Eu sou o Flyp. Posso te ajudar com ERP, te explicar como funcionaria em casos de empresas como Postos de Combustiveis, Mercados, Lojas, dentre outros.
+          </div>
+        </div>
+      </section>
+
+      <form id="chatForm" class="chat-input-area">
+        <input
+          type="text"
+          id="mensagem"
+          placeholder="Digite sua pergunta..."
+          autocomplete="off"
+        />
+        <button type="button" id="enviar">Enviar</button>
+      </form>
+    </main>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
