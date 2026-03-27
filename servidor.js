@@ -27,7 +27,7 @@ function gerarHistoricoInicial() {
       role: "model",
       parts: [
         {
-          text: "Olá! Eu sou o Flyp. Posso te ajudar com assuntos diversos. Pode perguntar!",
+          text: "Olá! Eu sou o Flyp. Fui desenvolvida pelo Arthur, para aprendizado. Mas, ele pretende me melhorar! no que posso te ajudar hoje? Pode perguntar!",
         },
       ],
     },

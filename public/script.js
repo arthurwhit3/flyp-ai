@@ -119,7 +119,7 @@ async function novaConversa() {
 
   chat.innerHTML = "";
   criarMensagem(
-    "Olá! Eu sou o Flyp. Posso te ajudar com assuntos diversos. Pode perguntar!",
+    "Olá! Eu sou o Flyp. Fui desenvolvida pelo Arthur, para aprendizado. Mas, ele pretende me melhorar! no que posso te ajudar hoje? Pode perguntar!",
     "bot"
   );
 
