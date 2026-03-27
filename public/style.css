@@ -140,6 +140,7 @@ body {
   overflow-y: auto;
   background: var(--panel-2);
   scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
 }
 
 .message {
@@ -174,7 +175,22 @@ body {
 .message.typing .bubble {
   background: var(--bot);
   color: #d7e3f8;
-  opacity: 0.9;
+  opacity: 0.95;
+}
+
+.message.typing .bubble::after {
+  content: "▋";
+  animation: piscar 0.8s infinite;
+  margin-left: 4px;
+}
+
+@keyframes piscar {
+  0%, 50% {
+    opacity: 1;
+  }
+  51%, 100% {
+    opacity: 0;
+  }
 }
 
 .chat-input-area {
@@ -188,6 +204,7 @@ body {
 
 #mensagem {
   width: 100%;
+  min-height: 48px;
   border: 1px solid var(--border);
   outline: none;
   background: rgba(255, 255, 255, 0.06);
@@ -207,6 +224,7 @@ body {
 }
 
 #enviar {
+  min-height: 48px;
   border: none;
   background: var(--success);
   color: white;
@@ -228,49 +246,6 @@ body {
 
 @media (max-width: 920px) {
   body {
-    padding: 12px;
-  }
-
-  .app {
-    grid-template-columns: 1fr;
-    height: calc(100vh - 24px);
-  }
-
-  .sidebar {
-    display: none;
-  }
-
-  .bubble {
-    max-width: 88%;
-  }
-}
-.chat-messages {
-  -webkit-overflow-scrolling: touch;
-}
-
-#mensagem,
-#enviar,
-.secondary-btn {
-  min-height: 48px;
-}
-
-.message.typing .bubble::after {
-  content: "▋";
-  animation: piscar 0.8s infinite;
-  margin-left: 4px;
-}
-
-@keyframes piscar {
-  0%, 50% {
-    opacity: 1;
-  }
-  51%, 100% {
-    opacity: 0;
-  }
-}
-
-@media (max-width: 920px) {
-  body {
     padding: 8px;
   }
 
@@ -278,6 +253,10 @@ body {
     height: calc(100vh - 16px);
     grid-template-columns: 1fr;
     gap: 0;
+  }
+
+  .sidebar {
+    display: none;
   }
 
   .chat-panel {

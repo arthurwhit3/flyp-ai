@@ -6,7 +6,7 @@ const express = require("express");
 const { GoogleGenAI } = require("@google/genai");
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
 app.use(express.static("public"));
@@ -27,7 +27,7 @@ function gerarHistoricoInicial() {
       role: "model",
       parts: [
         {
-          text: "Olá! Eu sou o Flyp. Posso te ajudar com ERP, te explicar como funcionaria em casos de empresas como Postos de Combustiveis, Mercados, Lojas, dentre outros.",
+          text: "Olá! Eu sou o Flyp. Posso te ajudar com sistemas de gestão, ERP e automação comercial.",
         },
       ],
     },
@@ -82,8 +82,8 @@ Regras:
 - Seja claro, simpático e objetivo.
 
 Temas principais:
-- ERP
-- Postos de combustíveis
+- Sistemas ERP
+- Gestão empresarial
 - Varejo
 - Automação comercial
         `,
@@ -109,7 +109,7 @@ Temas principais:
     console.error(erro);
 
     if (erro?.status === 429) {
-      return "A IA atingiu o limite de uso no momento. Tente novamente mais tarde.";
+      return "A IA atingiu o limite de uso no momento. Troque a chave da API ou tente novamente mais tarde.";
     }
 
     return "No momento não consegui responder. Tente novamente em instantes.";
@@ -168,5 +168,5 @@ app.post("/nova-conversa", (req, res) => {
 });
 
 app.listen(PORT, "0.0.0.0", () => {
-  console.log(`Servidor rodando em http://localhost:${PORT}`);
+  console.log(`Servidor rodando na porta ${PORT}`);
 });

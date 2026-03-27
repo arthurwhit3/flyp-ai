@@ -1,18 +1,17 @@
 {
-  "name": "flypper-ai",
+  "name": "flyp-ai",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "AI-powered virtual assistant for business customer service, developed with Node.js and web interface.",
+  "main": "servidor.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node servidor.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "commonjs",
   "dependencies": {
-    "@google/genai": "^1.46.0",
+    "@google/genai": "^1.21.0",
     "dotenv": "^17.3.1",
-    "express": "^5.2.1"
+    "express": "^5.1.0"
   }
 }

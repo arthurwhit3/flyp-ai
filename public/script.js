@@ -62,9 +62,6 @@ async function enviarMensagem() {
   const mensagem = input.value.trim();
   if (!mensagem) return;
 
-  console.log("ENVIANDO MENSAGEM:", mensagem);
-  console.log("SESSION ID:", sessionId);
-
   criarMensagem(mensagem, "user");
   input.value = "";
   input.focus();
@@ -94,10 +91,7 @@ async function enviarMensagem() {
       }),
     });
 
-    console.log("STATUS DA RESPOSTA:", resposta.status);
-
     const dados = await resposta.json();
-    console.log("DADOS RECEBIDOS:", dados);
 
     if (!resposta.ok) {
       typingBubble.textContent = dados.erro || "Não consegui responder agora.";
@@ -125,20 +119,18 @@ async function novaConversa() {
 
   chat.innerHTML = "";
   criarMensagem(
-    "Olá! Eu sou o Flyp. Posso te ajudar com ERP, postos de combustíveis, varejo e automação comercial.",
+    "Olá! Eu sou o Flyp. Posso te ajudar com sistemas de gestão, ERP e automação comercial.",
     "bot"
   );
 
   try {
-    const resposta = await fetch("/nova-conversa", {
+    await fetch("/nova-conversa", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ sessionId }),
     });
-
-    console.log("NOVA CONVERSA STATUS:", resposta.status);
   } catch (erro) {
     console.error("Erro ao iniciar nova conversa:", erro);
   }
