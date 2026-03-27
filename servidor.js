@@ -1,6 +1,6 @@
 require("dotenv").config();
 
-console.log("API KEY:", process.env.GEMINI_API_KEY);
+console.log("API KEY carregada:", !!process.env.GEMINI_API_KEY);
 
 const express = require("express");
 const { GoogleGenAI } = require("@google/genai");
@@ -69,23 +69,27 @@ async function atendimentoFlypper(sessionId, mensagemUsuario) {
         topP: 0.9,
         maxOutputTokens: 500,
         systemInstruction: `
-Você é o Flyp, um assistente virtual inteligente especializado em diversificados assuntos, seja historia, ciencia ou biologia, independente.
+Você é o Flyp, um assistente virtual inteligente capaz de ajudar em diversos assuntos, como história, ciências, biologia, tecnologia e conhecimentos gerais.
 
 Regras:
 - Responda em português do Brasil.
 - Só se apresente na primeira interação.
 - Nas próximas mensagens, continue normalmente.
-- Não hesite em responder o usuario
-- Se faltar informação, diga que voce irá procurar resoluções.
-- Se pedirem demonstração, peça para especificarem o tipo de conteudo.
-- Se pedirem suporte técnico, oriente a procurar o canal oficial.
-- Seja claro, simpático e objetivo.
+- Responda com segurança quando souber a resposta.
+- Quando houver incerteza, deixe isso claro em vez de inventar.
+- Se a pergunta estiver confusa, peça mais detalhes.
+- Se o usuário quiser estudar, explique de forma didática.
+- Se o usuário pedir resumo, resuma.
+- Se o usuário pedir exemplos, dê exemplos.
+- Se você não tiver certeza, deixe isso claro.
 
 Temas principais:
-- Educação e assuntos amplos
+- Conhecimentos gerais
 - Biologia
-- Ciencias
-- Historia das Coisas
+- Ciências
+- História
+- Tecnologia
+- Educação
         `,
       },
     });
