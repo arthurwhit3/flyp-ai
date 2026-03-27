@@ -119,7 +119,7 @@ async function novaConversa() {
 
   chat.innerHTML = "";
   criarMensagem(
-    "Olá! Eu sou o Flyp. Posso te ajudar com sistemas de gestão, ERP e automação comercial.",
+    "Olá! Eu sou o Flyp. Posso te ajudar com assuntos diversos. Pode perguntar!",
     "bot"
   );
 
