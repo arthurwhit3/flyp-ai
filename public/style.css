@@ -2,19 +2,13 @@
   --bg-1: #06101f;
   --bg-2: #0c1830;
   --bg-3: #101f3d;
-  --glass: rgba(255, 255, 255, 0.08);
-  --glass-strong: rgba(255, 255, 255, 0.12);
   --border: rgba(255, 255, 255, 0.14);
   --text: #edf4ff;
   --muted: #a9bad6;
   --primary: #5f8cff;
   --primary-2: #7a5cff;
   --success: #25d366;
-  --bot: rgba(255, 255, 255, 0.09);
   --shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
-  --radius-xl: 28px;
-  --radius-lg: 22px;
-  --radius-md: 18px;
   --transition: 0.35s ease;
 }
 
@@ -110,7 +104,7 @@ body {
 .landing-screen {
   position: fixed;
   inset: 0;
-  z-index: 2;
+  z-index: 20;
   display: grid;
   place-items: center;
   padding: 24px;
@@ -179,7 +173,10 @@ body {
 
 .primary-btn,
 .secondary-btn,
-#enviar {
+#enviar,
+.menu-toggle,
+.close-menu,
+.menu-item {
   border: none;
   cursor: pointer;
   transition: transform var(--transition), opacity var(--transition), filter var(--transition), background var(--transition);
@@ -198,7 +195,10 @@ body {
 
 .primary-btn:hover,
 .secondary-btn:hover,
-#enviar:hover {
+#enviar:hover,
+.menu-toggle:hover,
+.menu-item:hover,
+.close-menu:hover {
   transform: translateY(-2px);
   filter: brightness(1.05);
 }
@@ -206,7 +206,7 @@ body {
 /* APP */
 .app-wrapper {
   position: relative;
-  z-index: 1;
+  z-index: 5;
   padding: 20px;
   min-height: 100vh;
   display: grid;
@@ -233,7 +233,7 @@ body {
 
 .sidebar,
 .chat-panel {
-  border-radius: var(--radius-xl);
+  border-radius: 28px;
 }
 
 .sidebar {
@@ -302,6 +302,12 @@ body {
   color: var(--muted);
 }
 
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
 .status {
   display: inline-flex;
   align-items: center;
@@ -316,6 +322,29 @@ body {
   border-radius: 999px;
   background: var(--success);
   box-shadow: 0 0 16px rgba(37, 211, 102, 0.7);
+}
+
+.menu-toggle {
+  width: 48px;
+  height: 48px;
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.menu-toggle span {
+  display: block;
+  width: 18px;
+  height: 2px;
+  border-radius: 999px;
+  background: var(--text);
 }
 
 .chat-messages {
@@ -429,6 +458,96 @@ body {
 #enviar:disabled {
   opacity: 0.7;
   cursor: not-allowed;
+}
+
+/* MENU LATERAL */
+.menu-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(3, 8, 20, 0.45);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  z-index: 15;
+  opacity: 1;
+  transition: opacity 0.25s ease;
+}
+
+.side-menu {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  width: min(360px, calc(100vw - 20px));
+  max-height: calc(100vh - 40px);
+  overflow-y: auto;
+  z-index: 20;
+  border-radius: 26px;
+  padding: 18px;
+  transform: translateX(0);
+  opacity: 1;
+  transition: transform 0.28s ease, opacity 0.28s ease;
+}
+
+.side-menu.hidden,
+.menu-overlay.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.side-menu.hidden {
+  transform: translateX(18px);
+}
+
+.side-menu-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px;
+}
+
+.side-menu-header h2 {
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+.close-menu {
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text);
+  border-radius: 14px;
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+.menu-section {
+  margin-bottom: 18px;
+}
+
+.menu-section-title {
+  margin: 0 0 8px;
+  color: var(--muted);
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.menu-item {
+  width: 100%;
+  min-height: 48px;
+  margin-bottom: 8px;
+  text-align: left;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text);
+  border-radius: 16px;
+  padding: 0 14px;
+  font-size: 0.97rem;
+}
+
+.menu-item:hover {
+  background: rgba(255, 255, 255, 0.09);
+  transform: translateX(2px);
 }
 
 /* MARKDOWN */
@@ -559,5 +678,13 @@ body {
 
   .landing-card p {
     font-size: 0.98rem;
+  }
+
+  .side-menu {
+    top: 10px;
+    right: 10px;
+    width: calc(100vw - 20px);
+    max-height: calc(100vh - 20px);
+    border-radius: 22px;
   }
 }

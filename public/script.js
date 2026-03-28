@@ -7,6 +7,11 @@ const entrarBtn = document.getElementById("entrarBtn");
 const landingScreen = document.getElementById("landingScreen");
 const appWrapper = document.getElementById("appWrapper");
 
+const menuToggle = document.getElementById("menuToggle");
+const sideMenu = document.getElementById("sideMenu");
+const menuOverlay = document.getElementById("menuOverlay");
+const closeMenu = document.getElementById("closeMenu");
+
 function gerarSessionId() {
   if (window.crypto && crypto.randomUUID) {
     return "sessao-" + crypto.randomUUID();
@@ -29,7 +34,9 @@ function obterSessionId() {
 let sessionId = obterSessionId();
 
 function scrollChat() {
-  chat.scrollTop = chat.scrollHeight;
+  if (chat) {
+    chat.scrollTop = chat.scrollHeight;
+  }
 }
 
 function esperar(ms) {
@@ -37,12 +44,16 @@ function esperar(ms) {
 }
 
 function renderMarkdown(texto) {
-  const bruto = marked.parse(texto, {
-    breaks: true,
-    gfm: true
-  });
+  if (window.marked && window.DOMPurify) {
+    const bruto = marked.parse(texto, {
+      breaks: true,
+      gfm: true
+    });
 
-  return DOMPurify.sanitize(bruto);
+    return DOMPurify.sanitize(bruto);
+  }
+
+  return texto;
 }
 
 function criarMensagem(texto, tipo, usarMarkdown = false) {
@@ -59,8 +70,11 @@ function criarMensagem(texto, tipo, usarMarkdown = false) {
   }
 
   wrapper.appendChild(bubble);
-  chat.appendChild(wrapper);
-  scrollChat();
+
+  if (chat) {
+    chat.appendChild(wrapper);
+    scrollChat();
+  }
 
   return bubble;
 }
@@ -77,6 +91,8 @@ async function digitarTextoMarkdown(elemento, texto, velocidade = 9) {
 }
 
 function entrarNoChat() {
+  if (!landingScreen || !appWrapper) return;
+
   landingScreen.classList.add("exit");
 
   setTimeout(() => {
@@ -85,7 +101,23 @@ function entrarNoChat() {
   }, 420);
 }
 
+function abrirMenu() {
+  if (!sideMenu || !menuOverlay) return;
+
+  sideMenu.classList.remove("hidden");
+  menuOverlay.classList.remove("hidden");
+}
+
+function fecharMenu() {
+  if (!sideMenu || !menuOverlay) return;
+
+  sideMenu.classList.add("hidden");
+  menuOverlay.classList.add("hidden");
+}
+
 async function enviarMensagem() {
+  if (!input || !botao) return;
+
   const mensagem = input.value.trim();
   if (!mensagem) return;
 
@@ -103,8 +135,11 @@ async function enviarMensagem() {
   typingBubble.textContent = "Digitando...";
 
   typingWrapper.appendChild(typingBubble);
-  chat.appendChild(typingWrapper);
-  scrollChat();
+
+  if (chat) {
+    chat.appendChild(typingWrapper);
+    scrollChat();
+  }
 
   try {
     const resposta = await fetch("/chat", {
@@ -145,7 +180,10 @@ async function novaConversa() {
   sessionId = gerarSessionId();
   localStorage.setItem("flyp_session_id", sessionId);
 
-  chat.innerHTML = "";
+  if (chat) {
+    chat.innerHTML = "";
+  }
+
   criarMensagem(
     "Olá! Eu sou o **Flyp**.\n\nPosso te ajudar com biologia, ciências, história, tecnologia e assuntos diversos. Pode perguntar.",
     "bot",
@@ -165,21 +203,44 @@ async function novaConversa() {
   }
 }
 
-chatForm.addEventListener("submit", (event) => {
-  event.preventDefault();
-  enviarMensagem();
-});
-
-botao.addEventListener("click", () => {
-  enviarMensagem();
-});
-
-input.addEventListener("keydown", (event) => {
-  if (event.key === "Enter") {
+if (chatForm) {
+  chatForm.addEventListener("submit", (event) => {
     event.preventDefault();
     enviarMensagem();
-  }
-});
+  });
+}
 
-novaConversaBtn.addEventListener("click", novaConversa);
-entrarBtn.addEventListener("click", entrarNoChat);
+if (botao) {
+  botao.addEventListener("click", () => {
+    enviarMensagem();
+  });
+}
+
+if (input) {
+  input.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      enviarMensagem();
+    }
+  });
+}
+
+if (novaConversaBtn) {
+  novaConversaBtn.addEventListener("click", novaConversa);
+}
+
+if (entrarBtn) {
+  entrarBtn.addEventListener("click", entrarNoChat);
+}
+
+if (menuToggle) {
+  menuToggle.addEventListener("click", abrirMenu);
+}
+
+if (closeMenu) {
+  closeMenu.addEventListener("click", fecharMenu);
+}
+
+if (menuOverlay) {
+  menuOverlay.addEventListener("click", fecharMenu);
+}
