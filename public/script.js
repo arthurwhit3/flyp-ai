@@ -3,6 +3,9 @@ const input = document.getElementById("mensagem");
 const botao = document.getElementById("enviar");
 const chatForm = document.getElementById("chatForm");
 const novaConversaBtn = document.getElementById("novaConversa");
+const entrarBtn = document.getElementById("entrarBtn");
+const landingScreen = document.getElementById("landingScreen");
+const appWrapper = document.getElementById("appWrapper");
 
 function gerarSessionId() {
   if (window.crypto && crypto.randomUUID) {
@@ -29,13 +32,31 @@ function scrollChat() {
   chat.scrollTop = chat.scrollHeight;
 }
 
-function criarMensagem(texto, tipo) {
+function esperar(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function renderMarkdown(texto) {
+  const bruto = marked.parse(texto, {
+    breaks: true,
+    gfm: true
+  });
+
+  return DOMPurify.sanitize(bruto);
+}
+
+function criarMensagem(texto, tipo, usarMarkdown = false) {
   const wrapper = document.createElement("div");
   wrapper.className = `message ${tipo}`;
 
   const bubble = document.createElement("div");
-  bubble.className = "bubble";
-  bubble.textContent = texto;
+  bubble.className = "bubble markdown-content";
+
+  if (usarMarkdown) {
+    bubble.innerHTML = renderMarkdown(texto);
+  } else {
+    bubble.textContent = texto;
+  }
 
   wrapper.appendChild(bubble);
   chat.appendChild(wrapper);
@@ -44,25 +65,31 @@ function criarMensagem(texto, tipo) {
   return bubble;
 }
 
-function esperar(ms) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
-async function digitarTexto(elemento, texto, velocidade = 15) {
-  elemento.textContent = "";
+async function digitarTextoMarkdown(elemento, texto, velocidade = 9) {
+  let acumulado = "";
 
   for (let i = 0; i < texto.length; i++) {
-    elemento.textContent += texto[i];
+    acumulado += texto[i];
+    elemento.innerHTML = renderMarkdown(acumulado);
     scrollChat();
     await esperar(velocidade);
   }
+}
+
+function entrarNoChat() {
+  landingScreen.classList.add("exit");
+
+  setTimeout(() => {
+    landingScreen.classList.add("hidden");
+    appWrapper.classList.remove("hidden");
+  }, 420);
 }
 
 async function enviarMensagem() {
   const mensagem = input.value.trim();
   if (!mensagem) return;
 
-  criarMensagem(mensagem, "user");
+  criarMensagem(mensagem, "user", false);
   input.value = "";
   input.focus();
 
@@ -72,7 +99,7 @@ async function enviarMensagem() {
   typingWrapper.className = "message bot typing";
 
   const typingBubble = document.createElement("div");
-  typingBubble.className = "bubble";
+  typingBubble.className = "bubble markdown-content";
   typingBubble.textContent = "Digitando...";
 
   typingWrapper.appendChild(typingBubble);
@@ -94,17 +121,18 @@ async function enviarMensagem() {
     const dados = await resposta.json();
 
     if (!resposta.ok) {
+      typingWrapper.classList.remove("typing");
       typingBubble.textContent = dados.erro || "Não consegui responder agora.";
       return;
     }
 
     const textoResposta = dados.resposta || "Não consegui responder agora.";
-    await digitarTexto(typingBubble, textoResposta, 15);
 
+    await digitarTextoMarkdown(typingBubble, textoResposta, 8);
     typingWrapper.classList.remove("typing");
-    typingWrapper.classList.add("bot");
   } catch (erro) {
     console.error("ERRO NO FRONTEND:", erro);
+    typingWrapper.classList.remove("typing");
     typingBubble.textContent = "Erro de conexão com o servidor.";
   } finally {
     botao.disabled = false;
@@ -119,8 +147,9 @@ async function novaConversa() {
 
   chat.innerHTML = "";
   criarMensagem(
-    "Olá! Eu sou o Flyp. Fui desenvolvida pelo Arthur, para aprendizado. Mas, ele pretende me melhorar! no que posso te ajudar hoje? Pode perguntar!",
-    "bot"
+    "Olá! Eu sou o **Flyp**.\n\nPosso te ajudar com biologia, ciências, história, tecnologia e assuntos diversos. Pode perguntar.",
+    "bot",
+    true
   );
 
   try {
@@ -153,3 +182,4 @@ input.addEventListener("keydown", (event) => {
 });
 
 novaConversaBtn.addEventListener("click", novaConversa);
+entrarBtn.addEventListener("click", entrarNoChat);

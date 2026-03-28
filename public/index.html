@@ -5,58 +5,94 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Flyp | Assistente IA</title>
   <link rel="stylesheet" href="style.css" />
+  <link rel="icon" type="image/png" href="favicon.png" />
+
+  <!-- Markdown -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.6/dist/purify.min.js"></script>
 </head>
 <body>
-  <div class="app">
-    <aside class="sidebar">
-      <div>
-        <div class="brand">Flyp</div>
-        <div class="brand-subtitle">Assistente virtual para perguntas e aprendizagem</div>
+  <div class="background-blobs">
+    <span class="blob blob-1"></span>
+    <span class="blob blob-2"></span>
+    <span class="blob blob-3"></span>
+  </div>
+
+  <div id="landingScreen" class="landing-screen">
+    <div class="landing-card glass">
+      <div class="logo-orb">
+        <div class="logo-core">F</div>
       </div>
 
-      <button id="novaConversa" class="secondary-btn" type="button">+ Nova conversa</button>
+      <h1>Olá, eu sou o Flyp</h1>
+      <p>
+        Posso te ajudar com perguntas, estudos, explicações, curiosidades,
+        história, biologia, ciências, tecnologia e muito mais.
+      </p>
 
-      <div class="sidebar-info">
-        <p>Temas principais:</p>
-        <ul>
-          <li>Biologia</li>
-          <li>Ciências</li>
-          <li>História</li>
-          <li>Curiosidades e estudos</li>
-        </ul>
-      </div>
-    </aside>
+      <button id="entrarBtn" class="primary-btn">Entrar</button>
+    </div>
+  </div>
 
-    <main class="chat-panel">
-      <header class="chat-header">
+  <div id="appWrapper" class="app-wrapper hidden">
+    <div class="app">
+      <aside class="sidebar glass">
         <div>
-          <h1>Flyp</h1>
-          <p>Assistente virtual inteligente para diversos assuntos</p>
-        </div>
-        <div class="status">
-          <span class="status-dot"></span>
-          Online
-        </div>
-      </header>
-
-      <section id="chat" class="chat-messages">
-        <div class="message bot">
-          <div class="bubble">
-            Olá! Eu sou o Flyp. Fui desenvolvida pelo Arthur, para aprendizado. Mas, ele pretende me melhorar! no que posso te ajudar hoje? Pode perguntar!
+          <div class="brand">Flyp</div>
+          <div class="brand-subtitle">
+            Assistente virtual para estudos, curiosidades e conhecimentos gerais
           </div>
         </div>
-      </section>
 
-      <form id="chatForm" class="chat-input-area">
-        <input
-          type="text"
-          id="mensagem"
-          placeholder="Digite sua pergunta..."
-          autocomplete="off"
-        />
-        <button type="button" id="enviar">Enviar</button>
-      </form>
-    </main>
+        <button id="novaConversa" class="secondary-btn" type="button">
+          + Nova conversa
+        </button>
+
+        <div class="sidebar-info">
+          <p>Temas que o Flyp manda bem:</p>
+          <ul>
+            <li>Biologia</li>
+            <li>Ciências</li>
+            <li>História</li>
+            <li>Tecnologia</li>
+            <li>Conhecimentos gerais</li>
+          </ul>
+        </div>
+      </aside>
+
+      <main class="chat-panel glass">
+        <header class="chat-header">
+          <div>
+            <h1>Flyp</h1>
+            <p>Seu assistente virtual inteligente</p>
+          </div>
+
+          <div class="status">
+            <span class="status-dot"></span>
+            Online
+          </div>
+        </header>
+
+        <section id="chat" class="chat-messages">
+          <div class="message bot">
+            <div class="bubble markdown-content">
+              <p>Olá! Eu sou o <strong>Flyp</strong>.</p>
+              <p>Posso te ajudar com estudos, curiosidades e assuntos diversos. Pode perguntar.</p>
+            </div>
+          </div>
+        </section>
+
+        <form id="chatForm" class="chat-input-area">
+          <input
+            type="text"
+            id="mensagem"
+            placeholder="Digite sua pergunta..."
+            autocomplete="off"
+          />
+          <button type="button" id="enviar">Enviar</button>
+        </form>
+      </main>
+    </div>
   </div>
 
   <script src="script.js"></script>
