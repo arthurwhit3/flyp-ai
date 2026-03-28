@@ -32,6 +32,28 @@ html[data-theme="black"] {
   --muted: #b9b9b9;
 }
 
+html[data-theme="prism"] {
+  --bg-1: #05060a;
+  --bg-2: #0b1020;
+  --bg-3: #120b1d;
+  --primary: #8ec5ff;
+  --primary-2: #d46bff;
+  --text: #f5f7ff;
+  --muted: #c7d0ea;
+
+}
+
+html[data-theme="shine"] {
+  --bg-1: #020203;
+  --bg-2: #070b14;
+  --bg-3: #120713;
+  --primary: #ffffff;
+  --primary-2: #7a5cff;
+  --text: #fafafa;
+  --muted: #d2d2d2;
+
+}
+
 * {
   box-sizing: border-box;
   -webkit-tap-highlight-color: transparent;
@@ -853,3 +875,156 @@ body {
     padding: 18px;
   }
 }
+
+/* Prism easter egg */
+.prism-easter-egg {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+
+.prism-easter-egg.active {
+  opacity: 1;
+}
+
+.prism-scene {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center, rgba(255,255,255,0.08), transparent 35%);
+}
+
+.beam {
+  position: absolute;
+  height: 3px;
+  top: 50%;
+  transform-origin: left center;
+  border-radius: 999px;
+  box-shadow: 0 0 12px currentColor;
+}
+
+.beam-in {
+  left: 18%;
+  width: 24%;
+  background: rgba(255,255,255,0.95);
+  transform: translateY(-50%) rotate(0deg);
+}
+
+.prism-shape {
+  position: absolute;
+  left: 42%;
+  top: 50%;
+  width: 0;
+  height: 0;
+  transform: translateY(-50%);
+  border-left: 38px solid rgba(255,255,255,0.08);
+  border-top: 24px solid transparent;
+  border-bottom: 24px solid transparent;
+  filter: drop-shadow(0 0 18px rgba(255,255,255,0.16));
+}
+
+.beam-out {
+  left: 44.3%;
+  width: 26%;
+}
+
+.beam-red {
+  color: #ff4b4b;
+  background: #ff4b4b;
+  transform: translateY(-50%) rotate(-12deg);
+}
+
+.beam-orange {
+  color: #ff9f43;
+  background: #ff9f43;
+  transform: translateY(-50%) rotate(-8deg);
+}
+
+.beam-yellow {
+  color: #ffd93d;
+  background: #ffd93d;
+  transform: translateY(-50%) rotate(-4deg);
+}
+
+.beam-green {
+  color: #3ddc97;
+  background: #3ddc97;
+  transform: translateY(-50%) rotate(0deg);
+}
+
+.beam-blue {
+  color: #4dabff;
+  background: #4dabff;
+  transform: translateY(-50%) rotate(4deg);
+}
+
+.beam-indigo {
+  color: #5f6cff;
+  background: #5f6cff;
+  transform: translateY(-50%) rotate(8deg);
+}
+
+.beam-violet {
+  color: #c77dff;
+  background: #c77dff;
+  transform: translateY(-50%) rotate(12deg);
+}
+
+.prism-easter-egg.active .beam-in {
+  animation: beamInAnim 1.2s ease;
+}
+
+.prism-easter-egg.active .beam-out {
+  animation: beamOutAnim 1.2s ease;
+}
+
+.prism-easter-egg.active .prism-shape {
+  animation: prismPulse 1.2s ease;
+}
+
+@keyframes beamInAnim {
+  0% {
+    opacity: 0;
+    width: 0;
+  }
+  35% {
+    opacity: 1;
+    width: 24%;
+  }
+  100% {
+    opacity: 1;
+    width: 24%;
+  }
+}
+
+@keyframes beamOutAnim {
+  0% {
+    opacity: 0;
+    width: 0;
+  }
+  45% {
+    opacity: 0;
+    width: 0;
+  }
+  100% {
+    opacity: 1;
+    width: 26%;
+  }
+}
+
+@keyframes prismPulse {
+  0% {
+    opacity: 0;
+    transform: translateY(-50%) scale(0.92);
+  }
+  45% {
+    opacity: 1;
+    transform: translateY(-50%) scale(1);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(-50%) scale(1);
+  }
+} 
