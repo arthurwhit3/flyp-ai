@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" data-theme="blue">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -101,9 +101,9 @@
       </main>
     </div>
 
-    <div id="menuOverlay" class="menu-overlay hidden"></div>
+    <div id="menuOverlay" class="menu-overlay"></div>
 
-    <aside id="sideMenu" class="side-menu glass hidden">
+    <aside id="sideMenu" class="side-menu glass">
       <div class="side-menu-header">
         <h2>Menu</h2>
         <button id="closeMenu" class="close-menu" type="button" aria-label="Fechar menu">×</button>
@@ -111,7 +111,7 @@
 
       <div class="menu-section">
         <p class="menu-section-title">Conversa</p>
-        <button class="menu-item" type="button">+ Nova conversa</button>
+        <button id="menuNovaConversa" class="menu-item" type="button">+ Nova conversa</button>
         <button class="menu-item" type="button">Histórico</button>
         <button class="menu-item" type="button">Limpar conversa</button>
         <button class="menu-item" type="button">Exportar conversa</button>
@@ -124,17 +124,56 @@
 
       <div class="menu-section">
         <p class="menu-section-title">Aparência</p>
-        <button class="menu-item" type="button">Tema do chat</button>
-        <button class="menu-item" type="button">Tamanho da fonte</button>
+        <button class="menu-item theme-btn" data-theme="blue" type="button">Tema azul</button>
+        <button class="menu-item theme-btn" data-theme="purple" type="button">Tema roxo</button>
+        <button class="menu-item theme-btn" data-theme="black" type="button">Tema preto</button>
       </div>
 
       <div class="menu-section">
         <p class="menu-section-title">Sistema</p>
         <button class="menu-item" type="button">Configurações</button>
-        <button class="menu-item" type="button">Sobre o Flyp</button>
+        <button id="openAboutFlyp" class="menu-item" type="button">Sobre o Flyp</button>
       </div>
     </aside>
   </div>
+
+  <div id="aboutOverlay" class="about-overlay"></div>
+
+  <section id="aboutPanel" class="about-panel glass">
+    <div class="about-header">
+      <h2>Sobre o Flyp</h2>
+      <button id="closeAboutFlyp" class="close-menu" type="button" aria-label="Fechar sobre">×</button>
+    </div>
+
+    <div class="about-content">
+      <div class="about-logo-orb">
+        <div class="logo-core">F</div>
+      </div>
+
+      <p>
+        O <strong>Flyp</strong> nasceu de uma ideia simples: transformar curiosidade em construção.
+      </p>
+
+      <p>
+        Ele começou como um teste inspirado por um vídeo do Instagram e, com o tempo, foi evoluindo
+        com as ideias de Arthur, mais conhecido como <strong>White</strong>.
+      </p>
+
+      <p>
+        O que antes era apenas uma experiência rodando no terminal virou uma inteligência artificial com
+        interface própria, presença visual e identidade.
+      </p>
+
+      <p>
+        Hoje, o Flyp é um projeto em desenvolvimento criado para ajudar nas tarefas, dúvidas e estudos do dia a dia —
+        e no futuro pode crescer ainda mais, incluindo histórico de evolução, novas funções, contas de usuário e muito mais.
+      </p>
+
+      <div class="about-footer-note">
+        Em breve: linha do tempo da evolução do Flyp, desde o CMD até a versão atual.
+      </div>
+    </div>
+  </section>
 
   <script src="script.js"></script>
 </body>

@@ -11,6 +11,14 @@ const menuToggle = document.getElementById("menuToggle");
 const sideMenu = document.getElementById("sideMenu");
 const menuOverlay = document.getElementById("menuOverlay");
 const closeMenu = document.getElementById("closeMenu");
+const menuNovaConversa = document.getElementById("menuNovaConversa");
+
+const aboutOverlay = document.getElementById("aboutOverlay");
+const aboutPanel = document.getElementById("aboutPanel");
+const openAboutFlyp = document.getElementById("openAboutFlyp");
+const closeAboutFlyp = document.getElementById("closeAboutFlyp");
+
+const themeButtons = document.querySelectorAll(".theme-btn");
 
 function gerarSessionId() {
   if (window.crypto && crypto.randomUUID) {
@@ -31,7 +39,18 @@ function obterSessionId() {
   return sessionId;
 }
 
+function aplicarTemaSalvo() {
+  const tema = localStorage.getItem("flyp_theme") || "blue";
+  document.documentElement.setAttribute("data-theme", tema);
+}
+
+function salvarTema(tema) {
+  document.documentElement.setAttribute("data-theme", tema);
+  localStorage.setItem("flyp_theme", tema);
+}
+
 let sessionId = obterSessionId();
+aplicarTemaSalvo();
 
 function scrollChat() {
   if (chat) {
@@ -102,17 +121,34 @@ function entrarNoChat() {
 }
 
 function abrirMenu() {
-  if (!sideMenu || !menuOverlay) return;
+  if (!sideMenu || !menuOverlay || !menuToggle) return;
 
-  sideMenu.classList.remove("hidden");
-  menuOverlay.classList.remove("hidden");
+  sideMenu.classList.add("open");
+  menuOverlay.classList.add("open");
+  menuToggle.classList.add("active");
 }
 
 function fecharMenu() {
-  if (!sideMenu || !menuOverlay) return;
+  if (!sideMenu || !menuOverlay || !menuToggle) return;
 
-  sideMenu.classList.add("hidden");
-  menuOverlay.classList.add("hidden");
+  sideMenu.classList.remove("open");
+  menuOverlay.classList.remove("open");
+  menuToggle.classList.remove("active");
+}
+
+function abrirSobreFlyp() {
+  if (!aboutOverlay || !aboutPanel) return;
+
+  aboutOverlay.classList.add("open");
+  aboutPanel.classList.add("open");
+  fecharMenu();
+}
+
+function fecharSobreFlypPanel() {
+  if (!aboutOverlay || !aboutPanel) return;
+
+  aboutOverlay.classList.remove("open");
+  aboutPanel.classList.remove("open");
 }
 
 async function enviarMensagem() {
@@ -229,12 +265,27 @@ if (novaConversaBtn) {
   novaConversaBtn.addEventListener("click", novaConversa);
 }
 
+if (menuNovaConversa) {
+  menuNovaConversa.addEventListener("click", () => {
+    novaConversa();
+    fecharMenu();
+  });
+}
+
 if (entrarBtn) {
   entrarBtn.addEventListener("click", entrarNoChat);
 }
 
 if (menuToggle) {
-  menuToggle.addEventListener("click", abrirMenu);
+  menuToggle.addEventListener("click", () => {
+    const aberto = sideMenu.classList.contains("open");
+
+    if (aberto) {
+      fecharMenu();
+    } else {
+      abrirMenu();
+    }
+  });
 }
 
 if (closeMenu) {
@@ -244,3 +295,23 @@ if (closeMenu) {
 if (menuOverlay) {
   menuOverlay.addEventListener("click", fecharMenu);
 }
+
+if (openAboutFlyp) {
+  openAboutFlyp.addEventListener("click", abrirSobreFlyp);
+}
+
+if (closeAboutFlyp) {
+  closeAboutFlyp.addEventListener("click", fecharSobreFlypPanel);
+}
+
+if (aboutOverlay) {
+  aboutOverlay.addEventListener("click", fecharSobreFlypPanel);
+}
+
+themeButtons.forEach((btn) => {
+  btn.addEventListener("click", () => {
+    const tema = btn.dataset.theme;
+    salvarTema(tema);
+    fecharMenu();
+  });
+});
