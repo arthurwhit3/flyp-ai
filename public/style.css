@@ -33,25 +33,23 @@ html[data-theme="black"] {
 }
 
 html[data-theme="prism"] {
-  --bg-1: #05060a;
-  --bg-2: #0b1020;
-  --bg-3: #120b1d;
-  --primary: #8ec5ff;
-  --primary-2: #d46bff;
-  --text: #f5f7ff;
-  --muted: #c7d0ea;
-
+  --bg-1: #000000;
+  --bg-2: #05070f;
+  --bg-3: #0c1020;
+  --primary: #ffffff;
+  --primary-2: #88c8ff;
+  --text: #f8fbff;
+  --muted: #c6d2e8;
 }
 
 html[data-theme="shine"] {
-  --bg-1: #020203;
-  --bg-2: #070b14;
-  --bg-3: #120713;
+  --bg-1: #000000;
+  --bg-2: #05050a;
+  --bg-3: #120712;
   --primary: #ffffff;
-  --primary-2: #7a5cff;
-  --text: #fafafa;
-  --muted: #d2d2d2;
-
+  --primary-2: #ff5ad1;
+  --text: #ffffff;
+  --muted: #d8d8e8;
 }
 
 * {
@@ -133,6 +131,32 @@ body {
   animation-delay: 3.4s;
 }
 
+html[data-theme="prism"] .blob-1,
+html[data-theme="shine"] .blob-1 {
+  background: #ffffff;
+  opacity: 0.16;
+}
+
+html[data-theme="prism"] .blob-2 {
+  background: #4dabff;
+  opacity: 0.26;
+}
+
+html[data-theme="prism"] .blob-3 {
+  background: #c77dff;
+  opacity: 0.2;
+}
+
+html[data-theme="shine"] .blob-2 {
+  background: #ff4b4b;
+  opacity: 0.24;
+}
+
+html[data-theme="shine"] .blob-3 {
+  background: #c77dff;
+  opacity: 0.22;
+}
+
 @keyframes floatBlob {
   0%, 100% {
     transform: translateY(0px) translateX(0px) scale(1);
@@ -152,6 +176,16 @@ body {
   -webkit-backdrop-filter: blur(18px);
   border: 1px solid var(--border);
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+}
+
+html[data-theme="prism"] .glass,
+html[data-theme="shine"] .glass {
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.08),
+    rgba(255, 255, 255, 0.03)
+  );
+  border: 1px solid rgba(255, 255, 255, 0.12);
 }
 
 .hidden {
@@ -204,6 +238,16 @@ body {
   box-shadow: 0 0 40px rgba(95, 140, 255, 0.4);
 }
 
+html[data-theme="prism"] .logo-orb,
+html[data-theme="prism"] .about-logo-orb {
+  background: linear-gradient(135deg, #ffffff, #8ec5ff, #4dabff, #c77dff);
+}
+
+html[data-theme="shine"] .logo-orb,
+html[data-theme="shine"] .about-logo-orb {
+  background: linear-gradient(135deg, #ffffff, #ff4b4b, #ffd93d, #4dabff, #c77dff);
+}
+
 .logo-core {
   width: 66px;
   height: 66px;
@@ -251,6 +295,15 @@ body {
   font-size: 1rem;
   background: linear-gradient(135deg, var(--primary), var(--primary-2));
   box-shadow: 0 14px 32px rgba(95, 140, 255, 0.28);
+}
+
+html[data-theme="prism"] .primary-btn {
+  color: #000;
+  background: linear-gradient(135deg, #ffffff, #8ec5ff);
+}
+
+html[data-theme="shine"] .primary-btn {
+  background: linear-gradient(135deg, #ffffff, #ff4b4b, #c77dff);
 }
 
 .primary-btn:hover,
@@ -474,6 +527,16 @@ body {
   border-top-right-radius: 8px;
 }
 
+html[data-theme="prism"] .message.user .bubble {
+  color: #000;
+  background: linear-gradient(135deg, #ffffff, #9dd7ff, #7e7eff);
+}
+
+html[data-theme="shine"] .message.user .bubble {
+  background: linear-gradient(135deg, #ffffff, #ff4b4b, #ffd93d, #4dabff, #c77dff);
+  color: #000;
+}
+
 .message.typing .bubble {
   background: rgba(255, 255, 255, 0.08);
 }
@@ -527,6 +590,16 @@ body {
   color: white;
   font-weight: 700;
   background: linear-gradient(135deg, var(--primary), var(--primary-2));
+}
+
+html[data-theme="prism"] #enviar {
+  color: #000;
+  background: linear-gradient(135deg, #ffffff, #8ec5ff);
+}
+
+html[data-theme="shine"] #enviar {
+  color: #000;
+  background: linear-gradient(135deg, #ffffff, #ff4b4b, #ffd93d, #4dabff, #c77dff);
 }
 
 #enviar:disabled {
@@ -792,6 +865,159 @@ body {
   color: #d9e4f7;
 }
 
+/* prisma easter egg */
+.prism-easter-egg {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+
+.prism-easter-egg.active {
+  opacity: 1;
+}
+
+.prism-scene {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center, rgba(255,255,255,0.06), transparent 35%);
+}
+
+.beam {
+  position: absolute;
+  height: 3px;
+  top: 50%;
+  transform-origin: left center;
+  border-radius: 999px;
+  box-shadow: 0 0 12px currentColor;
+}
+
+.beam-in {
+  left: 16%;
+  width: 26%;
+  background: rgba(255,255,255,0.96);
+  transform: translateY(-50%) rotate(0deg);
+}
+
+.prism-shape {
+  position: absolute;
+  left: 42%;
+  top: 50%;
+  width: 0;
+  height: 0;
+  transform: translateY(-50%);
+  border-left: 42px solid rgba(255,255,255,0.08);
+  border-top: 26px solid transparent;
+  border-bottom: 26px solid transparent;
+  filter: drop-shadow(0 0 18px rgba(255,255,255,0.16));
+}
+
+.beam-out {
+  left: 44.6%;
+  width: 27%;
+}
+
+.beam-red {
+  color: #ff4b4b;
+  background: #ff4b4b;
+  transform: translateY(-50%) rotate(-12deg);
+}
+
+.beam-orange {
+  color: #ff9f43;
+  background: #ff9f43;
+  transform: translateY(-50%) rotate(-8deg);
+}
+
+.beam-yellow {
+  color: #ffd93d;
+  background: #ffd93d;
+  transform: translateY(-50%) rotate(-4deg);
+}
+
+.beam-green {
+  color: #3ddc97;
+  background: #3ddc97;
+  transform: translateY(-50%) rotate(0deg);
+}
+
+.beam-blue {
+  color: #4dabff;
+  background: #4dabff;
+  transform: translateY(-50%) rotate(4deg);
+}
+
+.beam-indigo {
+  color: #5f6cff;
+  background: #5f6cff;
+  transform: translateY(-50%) rotate(8deg);
+}
+
+.beam-violet {
+  color: #c77dff;
+  background: #c77dff;
+  transform: translateY(-50%) rotate(12deg);
+}
+
+.prism-easter-egg.active .beam-in {
+  animation: beamInAnim 1.2s ease;
+}
+
+.prism-easter-egg.active .beam-out {
+  animation: beamOutAnim 1.2s ease;
+}
+
+.prism-easter-egg.active .prism-shape {
+  animation: prismPulse 1.2s ease;
+}
+
+@keyframes beamInAnim {
+  0% {
+    opacity: 0;
+    width: 0;
+  }
+  35% {
+    opacity: 1;
+    width: 26%;
+  }
+  100% {
+    opacity: 1;
+    width: 26%;
+  }
+}
+
+@keyframes beamOutAnim {
+  0% {
+    opacity: 0;
+    width: 0;
+  }
+  45% {
+    opacity: 0;
+    width: 0;
+  }
+  100% {
+    opacity: 1;
+    width: 27%;
+  }
+}
+
+@keyframes prismPulse {
+  0% {
+    opacity: 0;
+    transform: translateY(-50%) scale(0.92);
+  }
+  45% {
+    opacity: 1;
+    transform: translateY(-50%) scale(1);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(-50%) scale(1);
+  }
+}
+
 /* mobile */
 @media (max-width: 920px) {
   html,
@@ -874,157 +1100,18 @@ body {
     border-radius: 24px;
     padding: 18px;
   }
-}
 
-/* Prism easter egg */
-.prism-easter-egg {
-  position: fixed;
-  inset: 0;
-  z-index: 100;
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 0.35s ease;
-}
-
-.prism-easter-egg.active {
-  opacity: 1;
-}
-
-.prism-scene {
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(circle at center, rgba(255,255,255,0.08), transparent 35%);
-}
-
-.beam {
-  position: absolute;
-  height: 3px;
-  top: 50%;
-  transform-origin: left center;
-  border-radius: 999px;
-  box-shadow: 0 0 12px currentColor;
-}
-
-.beam-in {
-  left: 18%;
-  width: 24%;
-  background: rgba(255,255,255,0.95);
-  transform: translateY(-50%) rotate(0deg);
-}
-
-.prism-shape {
-  position: absolute;
-  left: 42%;
-  top: 50%;
-  width: 0;
-  height: 0;
-  transform: translateY(-50%);
-  border-left: 38px solid rgba(255,255,255,0.08);
-  border-top: 24px solid transparent;
-  border-bottom: 24px solid transparent;
-  filter: drop-shadow(0 0 18px rgba(255,255,255,0.16));
-}
-
-.beam-out {
-  left: 44.3%;
-  width: 26%;
-}
-
-.beam-red {
-  color: #ff4b4b;
-  background: #ff4b4b;
-  transform: translateY(-50%) rotate(-12deg);
-}
-
-.beam-orange {
-  color: #ff9f43;
-  background: #ff9f43;
-  transform: translateY(-50%) rotate(-8deg);
-}
-
-.beam-yellow {
-  color: #ffd93d;
-  background: #ffd93d;
-  transform: translateY(-50%) rotate(-4deg);
-}
-
-.beam-green {
-  color: #3ddc97;
-  background: #3ddc97;
-  transform: translateY(-50%) rotate(0deg);
-}
-
-.beam-blue {
-  color: #4dabff;
-  background: #4dabff;
-  transform: translateY(-50%) rotate(4deg);
-}
-
-.beam-indigo {
-  color: #5f6cff;
-  background: #5f6cff;
-  transform: translateY(-50%) rotate(8deg);
-}
-
-.beam-violet {
-  color: #c77dff;
-  background: #c77dff;
-  transform: translateY(-50%) rotate(12deg);
-}
-
-.prism-easter-egg.active .beam-in {
-  animation: beamInAnim 1.2s ease;
-}
-
-.prism-easter-egg.active .beam-out {
-  animation: beamOutAnim 1.2s ease;
-}
-
-.prism-easter-egg.active .prism-shape {
-  animation: prismPulse 1.2s ease;
-}
-
-@keyframes beamInAnim {
-  0% {
-    opacity: 0;
-    width: 0;
+  .beam-in {
+    left: 8%;
+    width: 30%;
   }
-  35% {
-    opacity: 1;
-    width: 24%;
+
+  .prism-shape {
+    left: 38%;
   }
-  100% {
-    opacity: 1;
-    width: 24%;
+
+  .beam-out {
+    left: 41%;
+    width: 38%;
   }
 }
-
-@keyframes beamOutAnim {
-  0% {
-    opacity: 0;
-    width: 0;
-  }
-  45% {
-    opacity: 0;
-    width: 0;
-  }
-  100% {
-    opacity: 1;
-    width: 26%;
-  }
-}
-
-@keyframes prismPulse {
-  0% {
-    opacity: 0;
-    transform: translateY(-50%) scale(0.92);
-  }
-  45% {
-    opacity: 1;
-    transform: translateY(-50%) scale(1);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(-50%) scale(1);
-  }
-} 

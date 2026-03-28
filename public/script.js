@@ -24,25 +24,8 @@ const historyPanel = document.getElementById("historyPanel");
 const closeHistoryBtn = document.getElementById("closeHistoryBtn");
 const historyList = document.getElementById("historyList");
 
-const themeButtons = document.querySelectorAll(".theme-btn");
 const prismEasterEgg = document.getElementById("prismEasterEgg");
-
-function mostrarPrismaEasterEgg() {
-  if(!prismEasterEgg)
-    return;
-
-  prismEasterEgg.classList.add("active");
-
-  setTimeout(()=> {
-    prismEasterEgg.classList.remove("active");
-  }, 1800);
-}
-
-function ativarShineOn() {
-  salvarTema("shine");
-  mostrarPrismaEasterEgg();
-
-}
+const themeButtons = document.querySelectorAll(".theme-btn");
 
 function gerarSessionId() {
   if (window.crypto && crypto.randomUUID) {
@@ -291,19 +274,35 @@ function fecharSobreFlypPanel() {
   aboutPanel.classList.remove("open");
 }
 
+function mostrarPrismaEasterEgg() {
+  if (!prismEasterEgg) return;
+
+  prismEasterEgg.classList.add("active");
+
+  setTimeout(() => {
+    prismEasterEgg.classList.remove("active");
+  }, 1800);
+}
+
+function ativarShineOn() {
+  salvarTema("shine");
+  mostrarPrismaEasterEgg();
+}
+
 async function enviarMensagem() {
   if (!input || !botao) return;
 
   const mensagem = input.value.trim();
   if (!mensagem) return;
 
-  if(mensagem.toLowerCase()=== "shine on") {
+  if (mensagem.toLowerCase() === "shine on") {
     criarMensagem(mensagem, "user", false);
     input.value = "";
     input.focus();
+    salvarMensagemNoHistorico("user", mensagem);
     ativarShineOn();
     return;
-}
+  }
 
   criarMensagem(mensagem, "user", false);
   salvarMensagemNoHistorico("user", mensagem);
