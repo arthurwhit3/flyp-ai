@@ -18,6 +18,12 @@ const aboutPanel = document.getElementById("aboutPanel");
 const openAboutFlyp = document.getElementById("openAboutFlyp");
 const closeAboutFlyp = document.getElementById("closeAboutFlyp");
 
+const openHistoryBtn = document.getElementById("openHistoryBtn");
+const historyOverlay = document.getElementById("historyOverlay");
+const historyPanel = document.getElementById("historyPanel");
+const closeHistoryBtn = document.getElementById("closeHistoryBtn");
+const historyList = document.getElementById("historyList");
+
 const themeButtons = document.querySelectorAll(".theme-btn");
 
 function gerarSessionId() {
@@ -51,6 +57,122 @@ function salvarTema(tema) {
 
 let sessionId = obterSessionId();
 aplicarTemaSalvo();
+
+function getHistoryIndex() {
+  const raw = localStorage.getItem("flyp_chat_history_index");
+  return raw ? JSON.parse(raw) : [];
+}
+
+function setHistoryIndex(index) {
+  localStorage.setItem("flyp_chat_history_index", JSON.stringify(index));
+}
+
+function getChatStorageKey(id) {
+  return `flyp_chat_${id}`;
+}
+
+function salvarMensagemNoHistorico(role, content) {
+  const key = getChatStorageKey(sessionId);
+  const raw = localStorage.getItem(key);
+  const mensagens = raw ? JSON.parse(raw) : [];
+
+  mensagens.push({
+    role,
+    content,
+    createdAt: new Date().toISOString()
+  });
+
+  localStorage.setItem(key, JSON.stringify(mensagens));
+
+  let index = getHistoryIndex();
+  const existente = index.find((item) => item.sessionId === sessionId);
+
+  const primeiraMensagemUsuario = mensagens.find((msg) => msg.role === "user");
+  const previewBase = primeiraMensagemUsuario?.content || mensagens[0]?.content || "Nova conversa";
+  const preview = previewBase.slice(0, 80);
+
+  if (!existente) {
+    index.unshift({
+      sessionId,
+      title: `Conversa ${index.length + 1}`,
+      preview,
+      updatedAt: new Date().toISOString()
+    });
+  } else {
+    existente.updatedAt = new Date().toISOString();
+    existente.preview = preview;
+  }
+
+  setHistoryIndex(index);
+}
+
+function carregarMensagensDaSessao(id) {
+  const key = getChatStorageKey(id);
+  const raw = localStorage.getItem(key);
+  return raw ? JSON.parse(raw) : [];
+}
+
+function renderizarConversaSalva(id) {
+  const mensagens = carregarMensagensDaSessao(id);
+
+  if (!chat) return;
+
+  chat.innerHTML = "";
+
+  mensagens.forEach((msg) => {
+    criarMensagem(msg.content, msg.role === "user" ? "user" : "bot", msg.role !== "user");
+  });
+
+  scrollChat();
+}
+
+function renderizarListaHistorico() {
+  const index = getHistoryIndex();
+
+  if (!historyList) return;
+
+  historyList.innerHTML = "";
+
+  if (index.length === 0) {
+    historyList.innerHTML = `<p class="history-empty">Nenhuma conversa salva ainda.</p>`;
+    return;
+  }
+
+  index.forEach((item) => {
+    const btn = document.createElement("button");
+    btn.className = "history-card";
+    btn.type = "button";
+    btn.innerHTML = `
+      <div class="history-card-title">${item.title}</div>
+      <div class="history-card-preview">${item.preview}</div>
+    `;
+
+    btn.addEventListener("click", () => {
+      sessionId = item.sessionId;
+      localStorage.setItem("flyp_session_id", sessionId);
+      renderizarConversaSalva(sessionId);
+      fecharHistorico();
+    });
+
+    historyList.appendChild(btn);
+  });
+}
+
+function abrirHistorico() {
+  if (!historyOverlay || !historyPanel) return;
+
+  renderizarListaHistorico();
+  historyOverlay.classList.add("open");
+  historyPanel.classList.add("open");
+  fecharMenu();
+}
+
+function fecharHistorico() {
+  if (!historyOverlay || !historyPanel) return;
+
+  historyOverlay.classList.remove("open");
+  historyPanel.classList.remove("open");
+}
 
 function scrollChat() {
   if (chat) {
@@ -158,6 +280,8 @@ async function enviarMensagem() {
   if (!mensagem) return;
 
   criarMensagem(mensagem, "user", false);
+  salvarMensagemNoHistorico("user", mensagem);
+
   input.value = "";
   input.focus();
 
@@ -201,6 +325,7 @@ async function enviarMensagem() {
 
     await digitarTextoMarkdown(typingBubble, textoResposta, 8);
     typingWrapper.classList.remove("typing");
+    salvarMensagemNoHistorico("model", textoResposta);
   } catch (erro) {
     console.error("ERRO NO FRONTEND:", erro);
     typingWrapper.classList.remove("typing");
@@ -220,11 +345,11 @@ async function novaConversa() {
     chat.innerHTML = "";
   }
 
-  criarMensagem(
-    "Olá! Eu sou o **Flyp**.\n\nPosso te ajudar com biologia, ciências, história, tecnologia e assuntos diversos. Pode perguntar.",
-    "bot",
-    true
-  );
+  const mensagemInicial =
+    "Olá! Eu sou o **Flyp**.\n\nPosso te ajudar com biologia, ciências, história, tecnologia e assuntos diversos. Pode perguntar.";
+
+  criarMensagem(mensagemInicial, "bot", true);
+  salvarMensagemNoHistorico("model", mensagemInicial);
 
   try {
     await fetch("/nova-conversa", {
@@ -306,6 +431,18 @@ if (closeAboutFlyp) {
 
 if (aboutOverlay) {
   aboutOverlay.addEventListener("click", fecharSobreFlypPanel);
+}
+
+if (openHistoryBtn) {
+  openHistoryBtn.addEventListener("click", abrirHistorico);
+}
+
+if (closeHistoryBtn) {
+  closeHistoryBtn.addEventListener("click", fecharHistorico);
+}
+
+if (historyOverlay) {
+  historyOverlay.addEventListener("click", fecharHistorico);
 }
 
 themeButtons.forEach((btn) => {

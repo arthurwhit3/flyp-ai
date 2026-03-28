@@ -112,7 +112,7 @@
       <div class="menu-section">
         <p class="menu-section-title">Conversa</p>
         <button id="menuNovaConversa" class="menu-item" type="button">+ Nova conversa</button>
-        <button class="menu-item" type="button">Histórico</button>
+        <button id="openHistoryBtn" class="menu-item" type="button">Histórico</button>
         <button class="menu-item" type="button">Limpar conversa</button>
         <button class="menu-item" type="button">Exportar conversa</button>
       </div>
@@ -172,6 +172,19 @@
       <div class="about-footer-note">
         Em breve: linha do tempo da evolução do Flyp, desde o CMD até a versão atual.
       </div>
+    </div>
+  </section>
+
+  <div id="historyOverlay" class="about-overlay"></div>
+
+  <section id="historyPanel" class="about-panel glass">
+    <div class="about-header">
+      <h2>Histórico de conversas</h2>
+      <button id="closeHistoryBtn" class="close-menu" type="button" aria-label="Fechar histórico">×</button>
+    </div>
+
+    <div id="historyList" class="history-list">
+      <p class="history-empty">Nenhuma conversa salva ainda.</p>
     </div>
   </section>
 

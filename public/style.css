@@ -34,6 +34,22 @@ html[data-theme="black"] {
 
 * {
   box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+button,
+a,
+input,
+textarea,
+div {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button:focus,
+button:active,
+a:focus,
+a:active {
+  outline: none;
 }
 
 html,
@@ -197,7 +213,8 @@ body {
 #enviar,
 .menu-toggle,
 .close-menu,
-.menu-item {
+.menu-item,
+.history-card {
   border: none;
   cursor: pointer;
   transition: transform var(--transition), opacity var(--transition), filter var(--transition), background var(--transition);
@@ -219,7 +236,8 @@ body {
 #enviar:hover,
 .menu-toggle:hover,
 .menu-item:hover,
-.close-menu:hover {
+.close-menu:hover,
+.history-card:hover {
   transform: translateY(-2px);
   filter: brightness(1.05);
 }
@@ -655,6 +673,39 @@ body {
   background: rgba(255, 255, 255, 0.06);
   border: 1px solid rgba(255, 255, 255, 0.08);
   color: var(--text);
+}
+
+/* histórico */
+.history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.history-card {
+  width: 100%;
+  padding: 14px 16px;
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text);
+  text-align: left;
+}
+
+.history-card-title {
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.history-card-preview {
+  color: var(--muted);
+  font-size: 0.94rem;
+  line-height: 1.5;
+}
+
+.history-empty {
+  color: var(--muted);
+  margin: 0;
 }
 
 /* markdown */
