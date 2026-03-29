@@ -1,11 +1,3 @@
-if(!window.supabaseClient) {
-  alert("Supabase nao Inicializado.")
-  throw new Error("Supabase nao carregou");
-  
-}
-
-
-
 let userGlobal = null;
 let conversationId = null;
 let modoAuth = "login";
@@ -20,6 +12,7 @@ const landingScreen = document.getElementById("landingScreen");
 const appWrapper = document.getElementById("appWrapper");
 const chatTitle = document.getElementById("chatTitle");
 const recentChatsList = document.getElementById("recentChatsList");
+const statusText = document.getElementById("statusText");
 
 const menuToggle = document.getElementById("menuToggle");
 const sideMenu = document.getElementById("sideMenu");
@@ -27,6 +20,7 @@ const menuOverlay = document.getElementById("menuOverlay");
 const closeMenu = document.getElementById("closeMenu");
 const menuExcluirChat = document.getElementById("menuExcluirChat");
 const menuExportarConversa = document.getElementById("menuExportarConversa");
+const menuLogout = document.getElementById("menuLogout");
 
 const aboutOverlay = document.getElementById("aboutOverlay");
 const aboutPanel = document.getElementById("aboutPanel");
@@ -56,6 +50,10 @@ const authEmail = document.getElementById("email");
 const authPassword = document.getElementById("password");
 const authSubmit = document.getElementById("authSubmit");
 const closeModalBtn = document.getElementById("closeModal");
+
+if (!window.supabaseClient) {
+  console.error("Supabase não inicializado.");
+}
 
 function abrirLogin() {
   modoAuth = "login";
@@ -248,10 +246,17 @@ function renderizarChatsRecentes() {
 
     btn.innerHTML = `<div class="recent-chat-title">${item.title}</div>`;
 
-    btn.addEventListener("click", () => {
+    btn.addEventListener("click", async () => {
       sessionId = item.sessionId;
       localStorage.setItem("flyp_session_id", sessionId);
-      renderizarConversaSalva(sessionId);
+
+      if (userGlobal && item.dbConversationId) {
+        conversationId = item.dbConversationId;
+        await carregarMensagensDoBanco(conversationId);
+      } else {
+        renderizarConversaSalva(sessionId);
+      }
+
       renderizarChatsRecentes();
     });
 
@@ -277,6 +282,20 @@ function excluirChatAtual() {
   }
 
   renderizarChatsRecentes();
+}
+
+async function excluirConversaBanco(id) {
+  const token = await getAccessToken();
+  if (!token) return;
+
+  const resposta = await fetch(`/conversations/${id}`, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  return resposta.ok;
 }
 
 function exportarConversaAtual() {
@@ -441,6 +460,16 @@ function ativarShineOn() {
   mostrarPrismaEasterEgg();
 }
 
+async function getAccessToken() {
+  if (!window.supabaseClient) return null;
+
+  const {
+    data: { session },
+  } = await window.supabaseClient.auth.getSession();
+
+  return session?.access_token || null;
+}
+
 async function enviarMensagem() {
   if (!input || !botao) return;
 
@@ -479,15 +508,23 @@ async function enviarMensagem() {
   }
 
   try {
+    const headers = {
+      "Content-Type": "application/json",
+    };
+
+    if (userGlobal) {
+      const token = await getAccessToken();
+      if (token) {
+        headers.Authorization = `Bearer ${token}`;
+      }
+    }
+
     const resposta = await fetch("/chat", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers,
       body: JSON.stringify({
         mensagem,
-        userId: userGlobal?.id || null,
-        conversationId,
+        conversationId: userGlobal ? conversationId : null,
       }),
     });
 
@@ -508,6 +545,10 @@ async function enviarMensagem() {
     typingWrapper.classList.remove("typing");
     salvarMensagemNoHistorico("model", textoResposta);
     renderizarChatsRecentes();
+
+    if (userGlobal) {
+      await carregarConversasDoBanco();
+    }
   } catch (erro) {
     console.error("ERRO NO FRONTEND:", erro);
     typingWrapper.classList.remove("typing");
@@ -522,7 +563,6 @@ async function enviarMensagem() {
 function novaConversa() {
   sessionId = gerarSessionId();
   localStorage.setItem("flyp_session_id", sessionId);
-
   conversationId = null;
 
   if (chat) {
@@ -572,6 +612,8 @@ async function submitAuth() {
       }
 
       userGlobal = data.user;
+      await atualizarEstadoAutenticacao();
+      await carregarConversasDoBanco();
       alert("Logado com sucesso.");
     }
 
@@ -594,9 +636,99 @@ async function verificarUsuario() {
     }
 
     userGlobal = data.user || null;
+    await atualizarEstadoAutenticacao();
+
+    if (userGlobal) {
+      await carregarConversasDoBanco();
+    }
   } catch (error) {
     console.error("Erro inesperado ao verificar usuário:", error);
   }
+}
+
+async function atualizarEstadoAutenticacao() {
+  if (statusText) {
+    statusText.textContent = userGlobal ? "Online" : "Convidado";
+  }
+
+  if (menuLogout) {
+    menuLogout.classList.toggle("hidden", !userGlobal);
+  }
+}
+
+async function carregarConversasDoBanco() {
+  if (!userGlobal) return;
+
+  const token = await getAccessToken();
+  if (!token) return;
+
+  try {
+    const resposta = await fetch("/conversations", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!resposta.ok) return;
+
+    const conversas = await resposta.json();
+
+    const index = conversas.map((conv) => ({
+      sessionId: `db-${conv.id}`,
+      dbConversationId: conv.id,
+      title: conv.title || "Nova conversa",
+      updatedAt: conv.updated_at || conv.created_at || new Date().toISOString(),
+    }));
+
+    setHistoryIndex(index);
+    renderizarChatsRecentes();
+  } catch (erro) {
+    console.error("Erro ao carregar conversas:", erro);
+  }
+}
+
+async function carregarMensagensDoBanco(convId) {
+  if (!userGlobal || !convId) return;
+
+  const token = await getAccessToken();
+  if (!token) return;
+
+  try {
+    const resposta = await fetch(`/messages/${convId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!resposta.ok) return;
+
+    const mensagens = await resposta.json();
+
+    if (!chat) return;
+    chat.innerHTML = "";
+
+    mensagens.forEach((msg) => {
+      criarMensagem(
+        msg.content,
+        msg.role === "user" ? "user" : "bot",
+        msg.role !== "user"
+      );
+    });
+
+    scrollChat();
+  } catch (erro) {
+    console.error("Erro ao carregar mensagens:", erro);
+  }
+}
+
+async function logout() {
+  if (!window.supabaseClient) return;
+
+  await window.supabaseClient.auth.signOut();
+  userGlobal = null;
+  conversationId = null;
+  await atualizarEstadoAutenticacao();
+  fecharMenu();
 }
 
 if (typingSpeedSelect) {
@@ -665,7 +797,25 @@ if (openConfigPanel) openConfigPanel.addEventListener("click", abrirConfig);
 if (closeConfigPanel) closeConfigPanel.addEventListener("click", fecharConfig);
 if (configOverlay) configOverlay.addEventListener("click", fecharConfig);
 
-if (menuExcluirChat) menuExcluirChat.addEventListener("click", abrirConfirmacaoExclusao);
+if (menuExcluirChat) {
+  menuExcluirChat.addEventListener("click", async () => {
+    if (userGlobal && conversationId) {
+      const ok = await excluirConversaBanco(conversationId);
+      if (ok) {
+        conversationId = null;
+        sessionId = gerarSessionId();
+        localStorage.setItem("flyp_session_id", sessionId);
+        if (chat) chat.innerHTML = "";
+        await carregarConversasDoBanco();
+        fecharMenu();
+        return;
+      }
+    }
+
+    abrirConfirmacaoExclusao();
+  });
+}
+
 if (cancelDeleteChat) cancelDeleteChat.addEventListener("click", fecharConfirmacaoExclusao);
 if (confirmDeleteOverlay) confirmDeleteOverlay.addEventListener("click", fecharConfirmacaoExclusao);
 
@@ -678,6 +828,10 @@ if (confirmDeleteChat) {
 
 if (menuExportarConversa) {
   menuExportarConversa.addEventListener("click", exportarConversaAtual);
+}
+
+if (menuLogout) {
+  menuLogout.addEventListener("click", logout);
 }
 
 themeButtons.forEach((btn) => {

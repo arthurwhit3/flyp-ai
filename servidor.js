@@ -12,7 +12,6 @@ app.disable("x-powered-by");
 app.use(express.json({ limit: "100kb" }));
 app.use(express.static(path.join(__dirname, "public")));
 
-
 if (!process.env.SUPABASE_URL) {
   console.error("ERRO: SUPABASE_URL não definida.");
   process.exit(1);
@@ -28,7 +27,6 @@ if (!process.env.GEMINI_API_KEY) {
   process.exit(1);
 }
 
-
 const supabase = createClient(
   process.env.SUPABASE_URL,
   process.env.SUPABASE_SERVICE_ROLE_KEY
@@ -37,7 +35,6 @@ const supabase = createClient(
 const ai = new GoogleGenAI({
   apiKey: process.env.GEMINI_API_KEY,
 });
-
 
 function getBearerToken(req) {
   const authHeader = req.headers.authorization;
@@ -84,8 +81,6 @@ function validarConversationId(conversationId) {
   return typeof conversationId === "string" && conversationId.trim().length > 0;
 }
 
-
-
 async function ensureProfile(user) {
   const { data, error } = await supabase
     .from("profiles")
@@ -108,7 +103,6 @@ async function ensureProfile(user) {
     }
   }
 }
-
 
 async function criarConversa(userId, titulo = "Nova conversa") {
   const { data, error } = await supabase
@@ -168,7 +162,6 @@ function converterMensagensParaGemini(messages) {
     parts: [{ text: msg.content }],
   }));
 }
-
 
 app.get("/health", (_req, res) => {
   return res.status(200).json({ ok: true });
@@ -250,7 +243,6 @@ app.post("/chat", async (req, res) => {
   }
 });
 
-
 app.get("/conversations", async (req, res) => {
   try {
     const user = await getUserFromRequest(req);
@@ -273,7 +265,6 @@ app.get("/conversations", async (req, res) => {
     return res.status(500).json({ erro: "Erro ao buscar conversas." });
   }
 });
-
 
 app.get("/messages/:id", async (req, res) => {
   try {
@@ -308,7 +299,6 @@ app.get("/messages/:id", async (req, res) => {
     return res.status(500).json({ erro: "Erro ao buscar mensagens." });
   }
 });
-
 
 app.delete("/conversations/:id", async (req, res) => {
   try {

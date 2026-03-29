@@ -186,16 +186,15 @@ html[data-theme="shine"] .glass {
   display: none !important;
 }
 
+/* BOTÕES AUTH */
 .auth-buttons {
   position: fixed;
   top: 18px;
-  right: 22px;
+  right: 84px;
   z-index: 25;
   display: flex;
   gap: 10px;
   align-items: center;
-  width: auto;
-  pointer-events: auto;
 }
 
 .auth-buttons button {
@@ -212,6 +211,7 @@ html[data-theme="shine"] .glass {
   -webkit-backdrop-filter: blur(14px);
   box-shadow: 0 8px 24px rgba(0,0,0,0.16);
   transition: transform var(--transition), background var(--transition), border-color var(--transition), filter var(--transition);
+  flex: 0 0 auto;
 }
 
 .auth-buttons button:hover {
@@ -559,6 +559,8 @@ html[data-theme="shine"] .config-select {
 }
 
 .menu-toggle {
+  position: relative;
+  z-index: 35;
   width: 46px;
   height: 46px;
   border: 1px solid var(--border);
@@ -774,7 +776,7 @@ html[data-theme="shine"] .send-icon-btn {
   background: rgba(3, 8, 20, 0.45);
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
-  z-index: 15;
+  z-index: 45;
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.3s ease;
@@ -792,7 +794,7 @@ html[data-theme="shine"] .send-icon-btn {
   width: min(360px, calc(100vw - 20px));
   max-height: calc(100vh - 40px);
   overflow-y: auto;
-  z-index: 20;
+  z-index: 50;
   border-radius: 24px;
   padding: 18px;
   opacity: 0;
@@ -1351,7 +1353,7 @@ html[data-theme="shine"] #authSubmit {
 
   .auth-buttons {
     top: 12px;
-    right: 12px;
+    right: 72px;
     gap: 8px;
   }
 

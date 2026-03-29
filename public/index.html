@@ -2,24 +2,19 @@
 <html lang="pt-BR" data-theme="blue">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Flyp | Assistente IA</title>
-
-  <link rel="stylesheet" href="style.css"/>
-  <link rel="icon" type="image/png" href="favicon.png"/>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="icon" type="image/png" href="favicon.png" />
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="/supabase.js"></script>
-  <script src="/script.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.6/dist/purify.min.js"></script>
 </head>
-
 <body>
-
   <div class="auth-buttons">
-    <button id="btnLogin">Login</button>
-    <button id="btnSignup">Sign Up</button>
+    <button id="btnLogin" type="button">Login</button>
+    <button id="btnSignup" type="button">Sign Up</button>
   </div>
 
   <div class="background-blobs">
@@ -36,22 +31,21 @@
 
       <h1>Olá, eu sou o Flyp</h1>
       <p>
-        Posso te ajudar com perguntas, estudos, curiosidades,
-        explicações, tecnologia e muito mais.
+        Posso te ajudar com perguntas, estudos, curiosidades, explicações,
+        história, biologia, ciências, tecnologia e muito mais.
       </p>
 
-      <button id="entrarBtn" class="primary-btn">Entrar</button>
+      <button id="entrarBtn" class="primary-btn" type="button">Entrar</button>
     </div>
   </div>
 
   <div id="appWrapper" class="app-wrapper hidden">
     <div class="app">
-
       <aside class="sidebar glass">
         <div class="sidebar-top">
           <div class="brand minimal-brand">Flyp</div>
 
-          <button id="novaConversa" class="mini-new-chat-btn">
+          <button id="novaConversa" class="mini-new-chat-btn" type="button">
             + Nova conversa
           </button>
         </div>
@@ -66,16 +60,20 @@
 
       <main class="chat-panel glass">
         <header class="chat-header">
-          <h1 id="chatTitle">Nova conversa</h1>
+          <div class="chat-title-wrap">
+            <h1 id="chatTitle">Nova conversa</h1>
+          </div>
 
           <div class="header-actions">
             <div class="status">
               <span class="status-dot"></span>
-              Online
+              <span id="statusText">Online</span>
             </div>
 
-            <button id="menuToggle" class="menu-toggle">
-              <span></span><span></span><span></span>
+            <button id="menuToggle" class="menu-toggle" type="button" aria-label="Abrir menu">
+              <span></span>
+              <span></span>
+              <span></span>
             </button>
           </div>
         </header>
@@ -83,10 +81,156 @@
         <section id="chat" class="chat-messages"></section>
 
         <form id="chatForm" class="chat-input-area">
-          <input id="mensagem" placeholder="Digite sua pergunta..." autocomplete="off"/>
-          <button type="submit" id="enviar" class="send-icon-btn">➤</button>
+          <input
+            type="text"
+            id="mensagem"
+            placeholder="Digite sua pergunta..."
+            autocomplete="off"
+          />
+          <button type="submit" id="enviar" class="send-icon-btn" aria-label="Enviar mensagem">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M3 20L21 12L3 4L3.01 10L16 12L3.01 14L3 20Z"></path>
+            </svg>
+          </button>
         </form>
       </main>
+    </div>
+
+    <div id="menuOverlay" class="menu-overlay"></div>
+
+    <aside id="sideMenu" class="side-menu glass">
+      <div class="side-menu-header">
+        <h2>Menu</h2>
+        <button id="closeMenu" class="close-menu" type="button" aria-label="Fechar menu">×</button>
+      </div>
+
+      <div class="menu-section">
+        <p class="menu-section-title">Conversa</p>
+        <button id="menuExcluirChat" class="menu-item danger-text-item" type="button">Excluir chat</button>
+        <button id="menuExportarConversa" class="menu-item" type="button">Exportar conversa</button>
+      </div>
+
+      <div class="menu-section">
+        <p class="menu-section-title">Conta</p>
+        <button id="menuPerfil" class="menu-item" type="button">Perfil</button>
+        <button id="menuLogout" class="menu-item hidden" type="button">Sair</button>
+      </div>
+
+      <div class="menu-section">
+        <p class="menu-section-title">Sistema</p>
+        <button id="openConfigPanel" class="menu-item" type="button">Configurações</button>
+        <button id="openAboutFlyp" class="menu-item" type="button">Sobre o Flyp</button>
+      </div>
+    </aside>
+  </div>
+
+  <div id="aboutOverlay" class="about-overlay"></div>
+
+  <section id="aboutPanel" class="about-panel glass">
+    <div class="about-header">
+      <h2>Sobre o Flyp</h2>
+      <button id="closeAboutFlyp" class="close-menu" type="button" aria-label="Fechar sobre">×</button>
+    </div>
+
+    <div class="about-content">
+      <div class="about-logo-orb">
+        <div class="logo-core">F</div>
+      </div>
+
+      <p>
+        O <strong>Flyp</strong> é uma IA desenvolvida pela <strong>OrionAI</strong>, startup brasileira criada em 2026.
+      </p>
+
+      <p>
+        O projeto surgiu para fins educacionais e aprendizagem. Projetada por uma startup solo, a IA
+        se mantém em constante evolução para testes e projetos futuros, integrada a uma LLM via Google Gemini.
+      </p>
+
+      <p>
+        No início do desenvolvimento, ela rodava apenas no CMD, sem interface visual, o que não era nada prático.
+      </p>
+
+      <p>
+        Hoje, o Flyp é um projeto em desenvolvimento criado para ajudar nas tarefas, dúvidas e estudos do dia a dia.
+        No futuro, pode crescer ainda mais, incluindo contas de usuário, histórico persistente, novas funções,
+        integração mais profunda com banco de dados e muito mais.
+      </p>
+
+      <div class="about-footer-note">
+        Em breve: linha do tempo da evolução do Flyp, desde o CMD até a versão atual.
+      </div>
+    </div>
+  </section>
+
+  <div id="configOverlay" class="about-overlay"></div>
+
+  <section id="configPanel" class="about-panel glass">
+    <div class="about-header">
+      <h2>Configurações</h2>
+      <button id="closeConfigPanel" class="close-menu" type="button" aria-label="Fechar configurações">×</button>
+    </div>
+
+    <div class="config-grid">
+      <div class="config-block">
+        <div class="config-label">Tema</div>
+        <div class="theme-options">
+          <button class="config-chip theme-btn" data-theme="blue" type="button">Azul</button>
+          <button class="config-chip theme-btn" data-theme="purple" type="button">Roxo</button>
+          <button class="config-chip theme-btn" data-theme="black" type="button">Preto</button>
+          <button class="config-chip theme-btn" data-theme="prism" type="button">Prisma</button>
+        </div>
+      </div>
+
+      <div class="config-block">
+        <div class="config-label">Velocidade da escrita</div>
+        <select id="typingSpeedSelect" class="config-select">
+          <option value="4">Muito rápida</option>
+          <option value="8" selected>Normal</option>
+          <option value="15">Lenta</option>
+        </select>
+      </div>
+
+      <div class="config-block">
+        <div class="config-label">Animações</div>
+        <select id="animationsSelect" class="config-select">
+          <option value="on" selected>Ativadas</option>
+          <option value="off">Desativadas</option>
+        </select>
+      </div>
+
+      <div class="config-block">
+        <div class="config-label">Idioma da interface</div>
+        <select class="config-select">
+          <option selected>Português (Brasil)</option>
+          <option>English</option>
+        </select>
+      </div>
+    </div>
+  </section>
+
+  <div id="confirmDeleteOverlay" class="about-overlay"></div>
+
+  <section id="confirmDeletePanel" class="confirm-delete-panel glass">
+    <h3>Excluir chat?</h3>
+    <p>Tem certeza que deseja excluir este chat? Essa ação não pode ser desfeita.</p>
+
+    <div class="confirm-actions">
+      <button id="cancelDeleteChat" class="secondary-confirm-btn" type="button">Cancelar</button>
+      <button id="confirmDeleteChat" class="danger-confirm-btn" type="button">Excluir</button>
+    </div>
+  </section>
+
+  <div id="prismEasterEgg" class="prism-easter-egg">
+    <div class="prism-scene">
+      <div class="beam beam-in"></div>
+      <div class="prism-shape"></div>
+      <div class="beam beam-out beam-red"></div>
+      <div class="beam beam-out beam-orange"></div>
+      <div class="beam beam-out beam-yellow"></div>
+      <div class="beam beam-out beam-green"></div>
+      <div class="beam beam-out beam-blue"></div>
+      <div class="beam beam-out beam-indigo"></div>
+      <div class="beam beam-out beam-violet"></div>
     </div>
   </div>
 
@@ -94,16 +238,15 @@
     <div class="modal-content">
       <h2 id="authTitle">Login</h2>
 
-      <input id="email" type="email" placeholder="Email"/>
-      <input id="password" type="password" placeholder="Senha"/>
+      <input id="email" type="email" placeholder="Email" />
+      <input id="password" type="password" placeholder="Senha" />
 
-      <button id="authSubmit">Continuar</button>
-      <button id="closeModal">Fechar</button>
+      <button id="authSubmit" type="button">Continuar</button>
+      <button id="closeModal" type="button">Fechar</button>
     </div>
   </div>
 
-  <script src="supabase.js"></script>
-  <script src="script.js"></script>
-
+  <script src="/supabase.js"></script>
+  <script src="/script.js"></script>
 </body>
 </html>
