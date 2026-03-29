@@ -1,16 +1,17 @@
 {
   "name": "flyp-ai",
   "version": "1.0.0",
-  "description": "AI-powered virtual assistant for business customer service, developed with Node.js and web interface.",
+  "description": "Assistente virtual com Node.js e Gemini",
   "main": "servidor.js",
   "scripts": {
-    "start": "node servidor.js"
+    "start": "node servidor.js",
+    "dev": "node servidor.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@google/genai": "^1.21.0",
+    "@google/genai": "^1.17.0",
     "dotenv": "^17.3.1",
     "express": "^5.1.0"
   }
