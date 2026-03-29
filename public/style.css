@@ -186,6 +186,66 @@ html[data-theme="shine"] .glass {
   display: none !important;
 }
 
+/* BOTÕES AUTH */
+.auth-buttons {
+  position: fixed;
+  top: 18px;
+  right: 22px;
+  z-index: 60;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.auth-buttons button {
+  min-height: 40px;
+  padding: 0 16px;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,0.14);
+  background: rgba(255,255,255,0.06);
+  color: var(--text);
+  font-size: 0.92rem;
+  font-weight: 700;
+  cursor: pointer;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.16);
+  transition: transform var(--transition), background var(--transition), border-color var(--transition), filter var(--transition);
+}
+
+.auth-buttons button:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.05);
+}
+
+.auth-buttons #btnSignup {
+  background: linear-gradient(135deg, var(--primary), var(--primary-2));
+  border: none;
+  color: white;
+}
+
+html[data-theme="prism"] .auth-buttons button {
+  background:
+    linear-gradient(90deg, rgba(255,255,255,0.04), rgba(77,171,255,0.025), rgba(199,125,255,0.025));
+  border-color: rgba(255,255,255,0.16);
+}
+
+html[data-theme="prism"] .auth-buttons #btnSignup {
+  background: linear-gradient(135deg, #ffffff, #d8f1ff, #84cbff);
+  color: #000;
+}
+
+html[data-theme="shine"] .auth-buttons button {
+  background:
+    linear-gradient(90deg, rgba(255,75,75,0.02), rgba(255,217,61,0.02), rgba(77,171,255,0.02), rgba(199,125,255,0.02));
+  border-color: rgba(255,255,255,0.16);
+}
+
+html[data-theme="shine"] .auth-buttons #btnSignup {
+  background: linear-gradient(135deg, #ffffff, #ff4b4b, #ffd93d, #4dabff, #c77dff);
+  color: #000;
+}
+
 /* landing */
 .landing-screen {
   position: fixed;
@@ -1114,6 +1174,94 @@ html[data-theme="shine"] .send-icon-btn {
   100% { opacity: 1; transform: translateY(-50%) scale(1); }
 }
 
+/* MODAL */
+.modal {
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+  background: rgba(3, 8, 20, 0.68);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-content {
+  width: min(420px, calc(100vw - 24px));
+  padding: 22px;
+  border-radius: 22px;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.10), rgba(255,255,255,0.05));
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.modal-content h2 {
+  margin: 0 0 4px;
+  font-size: 1.3rem;
+}
+
+.modal-content input {
+  width: 100%;
+  min-height: 48px;
+  border: 1px solid rgba(255,255,255,0.10);
+  outline: none;
+  background: rgba(255,255,255,0.05);
+  color: var(--text);
+  border-radius: 14px;
+  padding: 12px 14px;
+  font-size: 0.98rem;
+}
+
+.modal-content input::placeholder {
+  color: var(--muted);
+}
+
+.modal-content input:focus {
+  border-color: rgba(95, 140, 255, 0.6);
+  box-shadow: 0 0 0 4px rgba(95, 140, 255, 0.12);
+}
+
+.modal-content button {
+  min-height: 46px;
+  border-radius: 14px;
+  border: none;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 0.95rem;
+  transition: transform var(--transition), filter var(--transition), background var(--transition);
+}
+
+.modal-content button:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.05);
+}
+
+#authSubmit {
+  background: linear-gradient(135deg, var(--primary), var(--primary-2));
+  color: white;
+}
+
+#closeModal {
+  background: rgba(255,255,255,0.06);
+  color: var(--text);
+  border: 1px solid rgba(255,255,255,0.08);
+}
+
+html[data-theme="prism"] #authSubmit {
+  color: #000;
+  background: linear-gradient(135deg, #ffffff, #d8f1ff, #84cbff);
+}
+
+html[data-theme="shine"] #authSubmit {
+  color: #000;
+  background: linear-gradient(135deg, #ffffff, #ff4b4b, #ffd93d, #4dabff, #c77dff);
+}
+
 @media (max-width: 920px) {
   html,
   body {
@@ -1178,7 +1326,8 @@ html[data-theme="shine"] .send-icon-btn {
   }
 
   .about-panel,
-  .confirm-delete-panel {
+  .confirm-delete-panel,
+  .modal-content {
     width: calc(100vw - 20px);
     max-height: calc(100vh - 20px);
     border-radius: 24px;
@@ -1199,38 +1348,16 @@ html[data-theme="shine"] .send-icon-btn {
     width: 38%;
   }
 
-  .modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.6);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  
-  }
-
-  .hidden {
-    display: nome;
-
-  }
-
-  .modal-content {
-    background: #111;
-    padding:20px;
-    border-radius: 12px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-
-  }
-
   .auth-buttons {
-    position: absolute;
-    top: 10px;
-    left: 10;
+    top: 12px;
+    right: 12px;
+    gap: 8px;
   }
 
+  .auth-buttons button {
+    min-height: 38px;
+    padding: 0 12px;
+    font-size: 0.85rem;
+    border-radius: 12px;
+  }
 }

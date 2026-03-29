@@ -40,26 +40,29 @@ const cancelDeleteChat = document.getElementById("cancelDeleteChat");
 const prismEasterEgg = document.getElementById("prismEasterEgg");
 const themeButtons = document.querySelectorAll(".theme-btn");
 
+const btnLogin = document.getElementById("btnLogin");
+const btnSignup = document.getElementById("btnSignup");
+const authModal = document.getElementById("authModal");
+const authTitle = document.getElementById("authTitle");
+const authEmail = document.getElementById("email");
+const authPassword = document.getElementById("password");
+const authSubmit = document.getElementById("authSubmit");
+const closeModalBtn = document.getElementById("closeModal");
+
 function abrirLogin() {
   modoAuth = "login";
-  document.getElementById("authTitle").innerText = "Login";
-
-  document.getElementById("authModal").classList.remove("hidden");
-
+  if (authTitle) authTitle.innerText = "Login";
+  if (authModal) authModal.classList.remove("hidden");
 }
 
 function abrirSignup() {
   modoAuth = "signup";
-  document.getElementById("authTitle").innerText = "Criar Conta";
-
-  document.getElementById("authModal").classList.remove("hidden");
-
+  if (authTitle) authTitle.innerText = "Criar Conta";
+  if (authModal) authModal.classList.remove("hidden");
 }
 
 function fecharModal() {
-
-document.getElementById("authModal").classList.add("hidden");
-
+  if (authModal) authModal.classList.add("hidden");
 }
 
 function gerarSessionId() {
@@ -159,7 +162,7 @@ function salvarMensagemNoHistorico(role, content) {
   mensagens.push({
     role,
     content,
-    createdAt: new Date().toISOString()
+    createdAt: new Date().toISOString(),
   });
 
   localStorage.setItem(key, JSON.stringify(mensagens));
@@ -168,13 +171,15 @@ function salvarMensagemNoHistorico(role, content) {
   let existente = index.find((item) => item.sessionId === sessionId);
 
   const primeiraMensagemUsuario = mensagens.find((msg) => msg.role === "user");
-  const title = primeiraMensagemUsuario ? normalizarTitulo(primeiraMensagemUsuario.content) : "Nova conversa";
+  const title = primeiraMensagemUsuario
+    ? normalizarTitulo(primeiraMensagemUsuario.content)
+    : "Nova conversa";
 
   if (!existente) {
     index.unshift({
       sessionId,
       title,
-      updatedAt: new Date().toISOString()
+      updatedAt: new Date().toISOString(),
     });
   } else {
     existente.updatedAt = new Date().toISOString();
@@ -200,7 +205,11 @@ function renderizarConversaSalva(id) {
   chat.innerHTML = "";
 
   mensagens.forEach((msg) => {
-    criarMensagem(msg.content, msg.role === "user" ? "user" : "bot", msg.role !== "user");
+    criarMensagem(
+      msg.content,
+      msg.role === "user" ? "user" : "bot",
+      msg.role !== "user"
+    );
   });
 
   scrollChat();
@@ -215,7 +224,8 @@ function renderizarChatsRecentes() {
   recentChatsList.innerHTML = "";
 
   if (index.length === 0) {
-    recentChatsList.innerHTML = `<p class="recent-empty">Nenhuma conversa ainda.</p>`;
+    recentChatsList.innerHTML =
+      `<p class="recent-empty">Nenhuma conversa ainda.</p>`;
     return;
   }
 
@@ -228,9 +238,7 @@ function renderizarChatsRecentes() {
       btn.classList.add("active");
     }
 
-    btn.innerHTML = `
-      <div class="recent-chat-title">${item.title}</div>
-    `;
+    btn.innerHTML = `<div class="recent-chat-title">${item.title}</div>`;
 
     btn.addEventListener("click", () => {
       sessionId = item.sessionId;
@@ -295,7 +303,7 @@ function renderMarkdown(texto) {
   if (window.marked && window.DOMPurify) {
     const bruto = marked.parse(texto, {
       breaks: true,
-      gfm: true
+      gfm: true,
     });
     return DOMPurify.sanitize(bruto);
   }
@@ -464,22 +472,22 @@ async function enviarMensagem() {
 
   try {
     const resposta = await fetch("/chat", {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json",
-  },
-  body: JSON.stringify({
-    mensagem,
-    userId: userGlobal?.id || null,
-    conversationId,
-  }),
-});
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        mensagem,
+        userId: userGlobal?.id || null,
+        conversationId,
+      }),
+    });
 
-const dados = await resposta.json();
+    const dados = await resposta.json();
 
-if (dados.conversationId) {
-  conversationId = dados.conversationId;
-}
+    if (dados.conversationId) {
+      conversationId = dados.conversationId;
+    }
 
     if (!resposta.ok) {
       typingWrapper.classList.remove("typing");
@@ -507,12 +515,80 @@ function novaConversa() {
   sessionId = gerarSessionId();
   localStorage.setItem("flyp_session_id", sessionId);
 
+  conversationId = null;
+
   if (chat) {
     chat.innerHTML = "";
   }
 
   atualizarTituloDoChat();
   renderizarChatsRecentes();
+}
+
+async function submitAuth() {
+  const email = authEmail?.value?.trim();
+  const password = authPassword?.value?.trim();
+
+  if (!email || !password) {
+    alert("Preencha email e senha.");
+    return;
+  }
+
+  if (!window.supabaseClient) {
+    alert("Supabase não inicializado.");
+    return;
+  }
+
+  try {
+    if (modoAuth === "signup") {
+      const { error } = await window.supabaseClient.auth.signUp({
+        email,
+        password,
+      });
+
+      if (error) {
+        alert(error.message);
+        return;
+      }
+
+      alert("Conta criada com sucesso.");
+    } else {
+      const { data, error } = await window.supabaseClient.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (error) {
+        alert(error.message);
+        return;
+      }
+
+      userGlobal = data.user;
+      alert("Logado com sucesso.");
+    }
+
+    fecharModal();
+  } catch (error) {
+    console.error("Erro na autenticação:", error);
+    alert("Erro ao autenticar.");
+  }
+}
+
+async function verificarUsuario() {
+  if (!window.supabaseClient) return;
+
+  try {
+    const { data, error } = await window.supabaseClient.auth.getUser();
+
+    if (error) {
+      console.error("Erro ao verificar usuário:", error.message);
+      return;
+    }
+
+    userGlobal = data.user || null;
+  } catch (error) {
+    console.error("Erro inesperado ao verificar usuário:", error);
+  }
 }
 
 if (typingSpeedSelect) {
@@ -561,9 +637,12 @@ if (entrarBtn) {
 
 if (menuToggle) {
   menuToggle.addEventListener("click", () => {
-    const aberto = sideMenu.classList.contains("open");
-    if (aberto) fecharMenu();
-    else abrirMenu();
+    const aberto = sideMenu?.classList.contains("open");
+    if (aberto) {
+      fecharMenu();
+    } else {
+      abrirMenu();
+    }
   });
 }
 
@@ -600,41 +679,22 @@ themeButtons.forEach((btn) => {
   });
 });
 
-async function submitAuth() {
-  const email = document.getElementById("email").value;
-  const password = document.getElementById("password").value;
-
-  if (modoAuth === "signup") {
-    const { error } = await supabaseClient.auth.signUp({
-      email,
-      password,
-    });
-
-    if (error) return alert(error.message);
-    alert("Conta criada!");
-  } else {
-    const { data, error } = await supabaseClient.auth.signInWithPassword({
-      email,
-      password,
-    });
-
-    if (error) return alert(error.message);
-
-    userGlobal = data.user;
-    alert("Logado!");
-  }
-
-  fecharModal();
+if (btnLogin) {
+  btnLogin.addEventListener("click", abrirLogin);
 }
 
-async function verificarUsuario() {
-  const { data } = await supabaseClient.auth.getUser();
-  userGlobal = data.user;
+if (btnSignup) {
+  btnSignup.addEventListener("click", abrirSignup);
+}
+
+if (authSubmit) {
+  authSubmit.addEventListener("click", submitAuth);
+}
+
+if (closeModalBtn) {
+  closeModalBtn.addEventListener("click", fecharModal);
 }
 
 verificarUsuario();
-
-
-
 renderizarChatsRecentes();
 atualizarTituloDoChat();
