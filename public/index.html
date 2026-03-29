@@ -1,12 +1,19 @@
 <!DOCTYPE html>
 <html lang="pt-BR" data-theme="blue">
 <head>
+  <div class="auth-buttons">
+    <button onclick="abrirLogin()">Login</button>
+    <button onclick="abrirSignUp()">Sign Up</button>
+  </div>
+
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Flyp | Assistente IA</title>
   <link rel="stylesheet" href="style.css" />
   <link rel="icon" type="image/png" href="favicon.png" />
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.6/dist/purify.min.js"></script>
 </head>
@@ -230,5 +237,18 @@
   </div>
 
   <script src="script.js"></script>
+
+  <div id="authModal" class="modal hidden">
+    <div class="modal-content">
+      <h2 id="authTitle"></h2>
+
+      <input id="email" placeholder="Email"/>
+      <input id="password" type="password" placeholder="Senha"/>
+
+      <button onclick="submitAuth()">Continuar</button>
+      <button onclick="fecharModal()">Fechar</button>
+    </div>
+  </div>
+
 </body>
 </html>

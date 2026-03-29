@@ -1,3 +1,7 @@
+let userGlobal = null;
+let conversationId = null;
+let modoAuth = "login";
+
 const chat = document.getElementById("chat");
 const input = document.getElementById("mensagem");
 const botao = document.getElementById("enviar");
@@ -35,6 +39,28 @@ const cancelDeleteChat = document.getElementById("cancelDeleteChat");
 
 const prismEasterEgg = document.getElementById("prismEasterEgg");
 const themeButtons = document.querySelectorAll(".theme-btn");
+
+function abrirLogin() {
+  modoAuth = "login";
+  document.getElementById("authTitle").innerText = "Login";
+
+  document.getElementById("authModal").classList.remove("hidden");
+
+}
+
+function abrirSignup() {
+  modoAuth = "signup";
+  document.getElementById("authTitle").innerText = "Criar Conta";
+
+  document.getElementById("authModal").classList.remove("hidden");
+
+}
+
+function fecharModal() {
+
+document.getElementById("authModal").classList.add("hidden");
+
+}
 
 function gerarSessionId() {
   if (window.crypto && crypto.randomUUID) {
@@ -438,17 +464,22 @@ async function enviarMensagem() {
 
   try {
     const resposta = await fetch("/chat", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        mensagem,
-        sessionId,
-      }),
-    });
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    mensagem,
+    userId: userGlobal?.id || null,
+    conversationId,
+  }),
+});
 
-    const dados = await resposta.json();
+const dados = await resposta.json();
+
+if (dados.conversationId) {
+  conversationId = dados.conversationId;
+}
 
     if (!resposta.ok) {
       typingWrapper.classList.remove("typing");
@@ -568,6 +599,42 @@ themeButtons.forEach((btn) => {
     salvarTema(tema);
   });
 });
+
+async function submitAuth() {
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+
+  if (modoAuth === "signup") {
+    const { error } = await supabaseClient.auth.signUp({
+      email,
+      password,
+    });
+
+    if (error) return alert(error.message);
+    alert("Conta criada!");
+  } else {
+    const { data, error } = await supabaseClient.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (error) return alert(error.message);
+
+    userGlobal = data.user;
+    alert("Logado!");
+  }
+
+  fecharModal();
+}
+
+async function verificarUsuario() {
+  const { data } = await supabaseClient.auth.getUser();
+  userGlobal = data.user;
+}
+
+verificarUsuario();
+
+
 
 renderizarChatsRecentes();
 atualizarTituloDoChat();
