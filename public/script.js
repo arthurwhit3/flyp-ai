@@ -6,23 +6,20 @@ const novaConversaBtn = document.getElementById("novaConversa");
 const entrarBtn = document.getElementById("entrarBtn");
 const landingScreen = document.getElementById("landingScreen");
 const appWrapper = document.getElementById("appWrapper");
+const chatTitle = document.getElementById("chatTitle");
+const recentChatsList = document.getElementById("recentChatsList");
 
 const menuToggle = document.getElementById("menuToggle");
 const sideMenu = document.getElementById("sideMenu");
 const menuOverlay = document.getElementById("menuOverlay");
 const closeMenu = document.getElementById("closeMenu");
-const menuNovaConversa = document.getElementById("menuNovaConversa");
+const menuLimparConversa = document.getElementById("menuLimparConversa");
+const menuExportarConversa = document.getElementById("menuExportarConversa");
 
 const aboutOverlay = document.getElementById("aboutOverlay");
 const aboutPanel = document.getElementById("aboutPanel");
 const openAboutFlyp = document.getElementById("openAboutFlyp");
 const closeAboutFlyp = document.getElementById("closeAboutFlyp");
-
-const openHistoryBtn = document.getElementById("openHistoryBtn");
-const historyOverlay = document.getElementById("historyOverlay");
-const historyPanel = document.getElementById("historyPanel");
-const closeHistoryBtn = document.getElementById("closeHistoryBtn");
-const historyList = document.getElementById("historyList");
 
 const prismEasterEgg = document.getElementById("prismEasterEgg");
 const themeButtons = document.querySelectorAll(".theme-btn");
@@ -72,6 +69,38 @@ function getChatStorageKey(id) {
   return `flyp_chat_${id}`;
 }
 
+function normalizarTitulo(texto) {
+  const t = texto.toLowerCase().trim();
+
+  if (t.includes("pearl jam")) return "História da Pearl Jam";
+  if (t.includes("pink floyd")) return "Universo do Pink Floyd";
+  if (t.includes("fotoss")) return "Explicação sobre Fotossíntese";
+  if (t.includes("biologia")) return "Dúvida de Biologia";
+  if (t.includes("história")) return "Pergunta de História";
+  if (t.includes("ciencia") || t.includes("ciência")) return "Pergunta de Ciências";
+  if (t.includes("tecnologia")) return "Tema de Tecnologia";
+
+  const limpo = texto
+    .replace(/[?!.]/g, "")
+    .trim()
+    .split(/\s+/)
+    .slice(0, 5)
+    .join(" ");
+
+  if (!limpo) return "Nova conversa";
+
+  return limpo.charAt(0).toUpperCase() + limpo.slice(1);
+}
+
+function atualizarTituloDoChat() {
+  const index = getHistoryIndex();
+  const atual = index.find((item) => item.sessionId === sessionId);
+
+  if (chatTitle) {
+    chatTitle.textContent = atual?.title || "Nova conversa";
+  }
+}
+
 function salvarMensagemNoHistorico(role, content) {
   const key = getChatStorageKey(sessionId);
   const raw = localStorage.getItem(key);
@@ -86,25 +115,30 @@ function salvarMensagemNoHistorico(role, content) {
   localStorage.setItem(key, JSON.stringify(mensagens));
 
   let index = getHistoryIndex();
-  const existente = index.find((item) => item.sessionId === sessionId);
+  let existente = index.find((item) => item.sessionId === sessionId);
 
   const primeiraMensagemUsuario = mensagens.find((msg) => msg.role === "user");
   const previewBase = primeiraMensagemUsuario?.content || mensagens[0]?.content || "Nova conversa";
   const preview = previewBase.slice(0, 80);
+  const title = primeiraMensagemUsuario ? normalizarTitulo(primeiraMensagemUsuario.content) : "Nova conversa";
 
   if (!existente) {
     index.unshift({
       sessionId,
-      title: `Conversa ${index.length + 1}`,
+      title,
       preview,
       updatedAt: new Date().toISOString()
     });
   } else {
     existente.updatedAt = new Date().toISOString();
     existente.preview = preview;
+    existente.title = title;
   }
 
+  index.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
   setHistoryIndex(index);
+  renderizarChatsRecentes();
+  atualizarTituloDoChat();
 }
 
 function carregarMensagensDaSessao(id) {
@@ -125,54 +159,81 @@ function renderizarConversaSalva(id) {
   });
 
   scrollChat();
+  atualizarTituloDoChat();
 }
 
-function renderizarListaHistorico() {
+function renderizarChatsRecentes() {
   const index = getHistoryIndex();
 
-  if (!historyList) return;
+  if (!recentChatsList) return;
 
-  historyList.innerHTML = "";
+  recentChatsList.innerHTML = "";
 
   if (index.length === 0) {
-    historyList.innerHTML = `<p class="history-empty">Nenhuma conversa salva ainda.</p>`;
+    recentChatsList.innerHTML = `<p class="recent-empty">Nenhuma conversa ainda.</p>`;
     return;
   }
 
   index.forEach((item) => {
     const btn = document.createElement("button");
-    btn.className = "history-card";
+    btn.className = "recent-chat-item";
     btn.type = "button";
+
+    if (item.sessionId === sessionId) {
+      btn.classList.add("active");
+    }
+
     btn.innerHTML = `
-      <div class="history-card-title">${item.title}</div>
-      <div class="history-card-preview">${item.preview}</div>
+      <div class="recent-chat-title">${item.title}</div>
+      <div class="recent-chat-preview">${item.preview}</div>
     `;
 
     btn.addEventListener("click", () => {
       sessionId = item.sessionId;
       localStorage.setItem("flyp_session_id", sessionId);
       renderizarConversaSalva(sessionId);
-      fecharHistorico();
+      renderizarChatsRecentes();
     });
 
-    historyList.appendChild(btn);
+    recentChatsList.appendChild(btn);
   });
 }
 
-function abrirHistorico() {
-  if (!historyOverlay || !historyPanel) return;
+function limparConversaAtual() {
+  localStorage.removeItem(getChatStorageKey(sessionId));
 
-  renderizarListaHistorico();
-  historyOverlay.classList.add("open");
-  historyPanel.classList.add("open");
+  const index = getHistoryIndex().filter((item) => item.sessionId !== sessionId);
+  setHistoryIndex(index);
+
+  if (chat) {
+    chat.innerHTML = "";
+  }
+
+  const mensagemInicial =
+    "Olá! Eu sou o **Flyp**.\n\nPosso te ajudar com biologia, ciências, história, tecnologia e assuntos diversos. Pode perguntar.";
+
+  criarMensagem(mensagemInicial, "bot", true);
+  salvarMensagemNoHistorico("model", mensagemInicial);
   fecharMenu();
 }
 
-function fecharHistorico() {
-  if (!historyOverlay || !historyPanel) return;
+function exportarConversaAtual() {
+  const mensagens = carregarMensagensDaSessao(sessionId);
 
-  historyOverlay.classList.remove("open");
-  historyPanel.classList.remove("open");
+  if (!mensagens.length) return;
+
+  const texto = mensagens
+    .map((msg) => `${msg.role === "user" ? "Você" : "Flyp"}: ${msg.content}`)
+    .join("\n\n");
+
+  const blob = new Blob([texto], { type: "text/plain;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `${chatTitle?.textContent || "conversa"}.txt`;
+  a.click();
+  URL.revokeObjectURL(url);
+  fecharMenu();
 }
 
 function scrollChat() {
@@ -240,6 +301,8 @@ function entrarNoChat() {
   setTimeout(() => {
     landingScreen.classList.add("hidden");
     appWrapper.classList.remove("hidden");
+    renderizarChatsRecentes();
+    atualizarTituloDoChat();
   }, 420);
 }
 
@@ -301,6 +364,7 @@ async function enviarMensagem() {
     input.focus();
     salvarMensagemNoHistorico("user", mensagem);
     ativarShineOn();
+    renderizarChatsRecentes();
     return;
   }
 
@@ -351,6 +415,7 @@ async function enviarMensagem() {
     await digitarTextoMarkdown(typingBubble, textoResposta, 8);
     typingWrapper.classList.remove("typing");
     salvarMensagemNoHistorico("model", textoResposta);
+    renderizarChatsRecentes();
   } catch (erro) {
     console.error("ERRO NO FRONTEND:", erro);
     typingWrapper.classList.remove("typing");
@@ -375,6 +440,7 @@ async function novaConversa() {
 
   criarMensagem(mensagemInicial, "bot", true);
   salvarMensagemNoHistorico("model", mensagemInicial);
+  renderizarChatsRecentes();
 
   try {
     await fetch("/nova-conversa", {
@@ -415,13 +481,6 @@ if (novaConversaBtn) {
   novaConversaBtn.addEventListener("click", novaConversa);
 }
 
-if (menuNovaConversa) {
-  menuNovaConversa.addEventListener("click", () => {
-    novaConversa();
-    fecharMenu();
-  });
-}
-
 if (entrarBtn) {
   entrarBtn.addEventListener("click", entrarNoChat);
 }
@@ -458,16 +517,12 @@ if (aboutOverlay) {
   aboutOverlay.addEventListener("click", fecharSobreFlypPanel);
 }
 
-if (openHistoryBtn) {
-  openHistoryBtn.addEventListener("click", abrirHistorico);
+if (menuLimparConversa) {
+  menuLimparConversa.addEventListener("click", limparConversaAtual);
 }
 
-if (closeHistoryBtn) {
-  closeHistoryBtn.addEventListener("click", fecharHistorico);
-}
-
-if (historyOverlay) {
-  historyOverlay.addEventListener("click", fecharHistorico);
+if (menuExportarConversa) {
+  menuExportarConversa.addEventListener("click", exportarConversaAtual);
 }
 
 themeButtons.forEach((btn) => {
@@ -477,3 +532,6 @@ themeButtons.forEach((btn) => {
     fecharMenu();
   });
 });
+
+renderizarChatsRecentes();
+atualizarTituloDoChat();

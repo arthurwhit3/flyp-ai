@@ -17,17 +17,6 @@
     <span class="blob blob-3"></span>
   </div>
 
-  <div class="prism-theme-lines">
-    <span class="prism-line prism-line-white"></span>
-    <span class="prism-line prism-line-red"></span>
-    <span class="prism-line prism-line-orange"></span>
-    <span class="prism-line prism-line-yellow"></span>
-    <span class="prism-line prism-line-green"></span>
-    <span class="prism-line prism-line-blue"></span>
-    <span class="prism-line prism-line-indigo"></span>
-    <span class="prism-line prism-line-violet"></span>
-  </div>
-
   <div id="landingScreen" class="landing-screen">
     <div class="landing-card glass">
       <div class="logo-orb">
@@ -47,34 +36,26 @@
   <div id="appWrapper" class="app-wrapper hidden">
     <div class="app">
       <aside class="sidebar glass">
-        <div>
-          <div class="brand">Flyp</div>
-          <div class="brand-subtitle">
-            Assistente virtual para estudos, curiosidades e conhecimentos gerais
-          </div>
+        <div class="sidebar-top">
+          <div class="brand minimal-brand">Flyp</div>
+
+          <button id="novaConversa" class="mini-new-chat-btn" type="button">
+            + Nova conversa
+          </button>
         </div>
 
-        <button id="novaConversa" class="secondary-btn" type="button">
-          + Nova conversa
-        </button>
-
-        <div class="sidebar-info">
-          <p>Temas que o Flyp manda bem:</p>
-          <ul>
-            <li>Biologia</li>
-            <li>Ciências</li>
-            <li>História</li>
-            <li>Tecnologia</li>
-            <li>Conhecimentos gerais</li>
-          </ul>
+        <div class="recent-chats-section">
+          <div class="recent-chats-title">Recentes</div>
+          <div id="recentChatsList" class="recent-chats-list">
+            <p class="recent-empty">Nenhuma conversa ainda.</p>
+          </div>
         </div>
       </aside>
 
       <main class="chat-panel glass">
         <header class="chat-header">
-          <div>
-            <h1>Flyp</h1>
-            <p>Seu assistente virtual inteligente</p>
+          <div class="chat-title-wrap">
+            <h1 id="chatTitle">Nova conversa</h1>
           </div>
 
           <div class="header-actions">
@@ -107,7 +88,11 @@
             placeholder="Digite sua pergunta..."
             autocomplete="off"
           />
-          <button type="button" id="enviar">Enviar</button>
+          <button type="button" id="enviar" class="send-icon-btn" aria-label="Enviar mensagem">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M3 20L21 12L3 4L3.01 10L16 12L3.01 14L3 20Z"></path>
+            </svg>
+          </button>
         </form>
       </main>
     </div>
@@ -122,10 +107,8 @@
 
       <div class="menu-section">
         <p class="menu-section-title">Conversa</p>
-        <button id="menuNovaConversa" class="menu-item" type="button">+ Nova conversa</button>
-        <button id="openHistoryBtn" class="menu-item" type="button">Histórico</button>
-        <button class="menu-item" type="button">Limpar conversa</button>
-        <button class="menu-item" type="button">Exportar conversa</button>
+        <button id="menuLimparConversa" class="menu-item" type="button">Limpar conversa</button>
+        <button id="menuExportarConversa" class="menu-item" type="button">Exportar conversa</button>
       </div>
 
       <div class="menu-section">
@@ -184,19 +167,6 @@
       <div class="about-footer-note">
         Em breve: linha do tempo da evolução do Flyp, desde o CMD até a versão atual.
       </div>
-    </div>
-  </section>
-
-  <div id="historyOverlay" class="about-overlay"></div>
-
-  <section id="historyPanel" class="about-panel glass">
-    <div class="about-header">
-      <h2>Histórico de conversas</h2>
-      <button id="closeHistoryBtn" class="close-menu" type="button" aria-label="Fechar histórico">×</button>
-    </div>
-
-    <div id="historyList" class="history-list">
-      <p class="history-empty">Nenhuma conversa salva ainda.</p>
     </div>
   </section>
 
