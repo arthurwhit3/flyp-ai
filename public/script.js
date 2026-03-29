@@ -1,3 +1,11 @@
+if(!window.supabaseClient) {
+  alert("Supabase nao Inicializado.")
+  throw new Error("Supabase nao carregou");
+  
+}
+
+
+
 let userGlobal = null;
 let conversationId = null;
 let modoAuth = "login";
