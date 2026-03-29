@@ -72,14 +72,7 @@
           </div>
         </header>
 
-        <section id="chat" class="chat-messages">
-          <div class="message bot">
-            <div class="bubble markdown-content">
-              <p>Olá! Eu sou o <strong>Flyp</strong>.</p>
-              <p>Posso te ajudar com estudos, curiosidades e assuntos diversos. Pode perguntar.</p>
-            </div>
-          </div>
-        </section>
+        <section id="chat" class="chat-messages"></section>
 
         <form id="chatForm" class="chat-input-area">
           <input
@@ -107,7 +100,7 @@
 
       <div class="menu-section">
         <p class="menu-section-title">Conversa</p>
-        <button id="menuLimparConversa" class="menu-item" type="button">Limpar conversa</button>
+        <button id="menuExcluirChat" class="menu-item danger-text-item" type="button">Excluir chat</button>
         <button id="menuExportarConversa" class="menu-item" type="button">Exportar conversa</button>
       </div>
 
@@ -117,16 +110,8 @@
       </div>
 
       <div class="menu-section">
-        <p class="menu-section-title">Aparência</p>
-        <button class="menu-item theme-btn" data-theme="blue" type="button">Tema azul</button>
-        <button class="menu-item theme-btn" data-theme="purple" type="button">Tema roxo</button>
-        <button class="menu-item theme-btn" data-theme="black" type="button">Tema preto</button>
-        <button class="menu-item theme-btn" data-theme="prism" type="button">Tema Prisma</button>
-      </div>
-
-      <div class="menu-section">
         <p class="menu-section-title">Sistema</p>
-        <button class="menu-item" type="button">Configurações</button>
+        <button id="openConfigPanel" class="menu-item" type="button">Configurações</button>
         <button id="openAboutFlyp" class="menu-item" type="button">Sobre o Flyp</button>
       </div>
     </aside>
@@ -167,6 +152,64 @@
       <div class="about-footer-note">
         Em breve: linha do tempo da evolução do Flyp, desde o CMD até a versão atual.
       </div>
+    </div>
+  </section>
+
+  <div id="configOverlay" class="about-overlay"></div>
+
+  <section id="configPanel" class="about-panel glass">
+    <div class="about-header">
+      <h2>Configurações</h2>
+      <button id="closeConfigPanel" class="close-menu" type="button" aria-label="Fechar configurações">×</button>
+    </div>
+
+    <div class="config-grid">
+      <div class="config-block">
+        <div class="config-label">Tema</div>
+        <div class="theme-options">
+          <button class="config-chip theme-btn" data-theme="blue" type="button">Azul</button>
+          <button class="config-chip theme-btn" data-theme="purple" type="button">Roxo</button>
+          <button class="config-chip theme-btn" data-theme="black" type="button">Preto</button>
+          <button class="config-chip theme-btn" data-theme="prism" type="button">Prisma</button>
+        </div>
+      </div>
+
+      <div class="config-block">
+        <div class="config-label">Velocidade da escrita</div>
+        <select id="typingSpeedSelect" class="config-select">
+          <option value="4">Muito rápida</option>
+          <option value="8" selected>Normal</option>
+          <option value="15">Lenta</option>
+        </select>
+      </div>
+
+      <div class="config-block">
+        <div class="config-label">Animações</div>
+        <select id="animationsSelect" class="config-select">
+          <option value="on" selected>Ativadas</option>
+          <option value="off">Desativadas</option>
+        </select>
+      </div>
+
+      <div class="config-block">
+        <div class="config-label">Idioma da interface</div>
+        <select class="config-select">
+          <option selected>Português (Brasil)</option>
+          <option>English</option>
+        </select>
+      </div>
+    </div>
+  </section>
+
+  <div id="confirmDeleteOverlay" class="about-overlay"></div>
+
+  <section id="confirmDeletePanel" class="confirm-delete-panel glass">
+    <h3>Excluir chat?</h3>
+    <p>Tem certeza que deseja excluir este chat? Essa ação não pode ser desfeita.</p>
+
+    <div class="confirm-actions">
+      <button id="cancelDeleteChat" class="secondary-confirm-btn" type="button">Cancelar</button>
+      <button id="confirmDeleteChat" class="danger-confirm-btn" type="button">Excluir</button>
     </div>
   </section>
 

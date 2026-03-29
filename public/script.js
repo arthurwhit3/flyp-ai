@@ -13,13 +13,25 @@ const menuToggle = document.getElementById("menuToggle");
 const sideMenu = document.getElementById("sideMenu");
 const menuOverlay = document.getElementById("menuOverlay");
 const closeMenu = document.getElementById("closeMenu");
-const menuLimparConversa = document.getElementById("menuLimparConversa");
+const menuExcluirChat = document.getElementById("menuExcluirChat");
 const menuExportarConversa = document.getElementById("menuExportarConversa");
 
 const aboutOverlay = document.getElementById("aboutOverlay");
 const aboutPanel = document.getElementById("aboutPanel");
 const openAboutFlyp = document.getElementById("openAboutFlyp");
 const closeAboutFlyp = document.getElementById("closeAboutFlyp");
+
+const configOverlay = document.getElementById("configOverlay");
+const configPanel = document.getElementById("configPanel");
+const openConfigPanel = document.getElementById("openConfigPanel");
+const closeConfigPanel = document.getElementById("closeConfigPanel");
+const typingSpeedSelect = document.getElementById("typingSpeedSelect");
+const animationsSelect = document.getElementById("animationsSelect");
+
+const confirmDeleteOverlay = document.getElementById("confirmDeleteOverlay");
+const confirmDeletePanel = document.getElementById("confirmDeletePanel");
+const confirmDeleteChat = document.getElementById("confirmDeleteChat");
+const cancelDeleteChat = document.getElementById("cancelDeleteChat");
 
 const prismEasterEgg = document.getElementById("prismEasterEgg");
 const themeButtons = document.querySelectorAll(".theme-btn");
@@ -28,19 +40,16 @@ function gerarSessionId() {
   if (window.crypto && crypto.randomUUID) {
     return "sessao-" + crypto.randomUUID();
   }
-
   return "sessao-" + Date.now() + "-" + Math.floor(Math.random() * 1000000);
 }
 
 function obterSessionId() {
-  let sessionId = localStorage.getItem("flyp_session_id");
-
-  if (!sessionId) {
-    sessionId = gerarSessionId();
-    localStorage.setItem("flyp_session_id", sessionId);
+  let value = localStorage.getItem("flyp_session_id");
+  if (!value) {
+    value = gerarSessionId();
+    localStorage.setItem("flyp_session_id", value);
   }
-
-  return sessionId;
+  return value;
 }
 
 function aplicarTemaSalvo() {
@@ -51,6 +60,22 @@ function aplicarTemaSalvo() {
 function salvarTema(tema) {
   document.documentElement.setAttribute("data-theme", tema);
   localStorage.setItem("flyp_theme", tema);
+}
+
+function getTypingSpeed() {
+  return Number(localStorage.getItem("flyp_typing_speed") || "8");
+}
+
+function setTypingSpeed(value) {
+  localStorage.setItem("flyp_typing_speed", String(value));
+}
+
+function getAnimationsEnabled() {
+  return localStorage.getItem("flyp_animations") !== "off";
+}
+
+function setAnimationsEnabled(value) {
+  localStorage.setItem("flyp_animations", value ? "on" : "off");
 }
 
 let sessionId = obterSessionId();
@@ -72,19 +97,19 @@ function getChatStorageKey(id) {
 function normalizarTitulo(texto) {
   const t = texto.toLowerCase().trim();
 
-  if (t.includes("pearl jam")) return "História da Pearl Jam";
-  if (t.includes("pink floyd")) return "Universo do Pink Floyd";
-  if (t.includes("fotoss")) return "Explicação sobre Fotossíntese";
-  if (t.includes("biologia")) return "Dúvida de Biologia";
-  if (t.includes("história")) return "Pergunta de História";
-  if (t.includes("ciencia") || t.includes("ciência")) return "Pergunta de Ciências";
-  if (t.includes("tecnologia")) return "Tema de Tecnologia";
+  if (t.includes("pearl jam")) return "Pearl Jam e sua história";
+  if (t.includes("pink floyd")) return "Pink Floyd e sua trajetória";
+  if (t.includes("fotoss")) return "Explicação sobre fotossíntese";
+  if (t.includes("biologia")) return "Dúvida de biologia";
+  if (t.includes("história")) return "Pergunta de história";
+  if (t.includes("ciencia") || t.includes("ciência")) return "Pergunta de ciências";
+  if (t.includes("tecnologia")) return "Tema de tecnologia";
 
   const limpo = texto
     .replace(/[?!.]/g, "")
     .trim()
     .split(/\s+/)
-    .slice(0, 5)
+    .slice(0, 6)
     .join(" ");
 
   if (!limpo) return "Nova conversa";
@@ -95,7 +120,6 @@ function normalizarTitulo(texto) {
 function atualizarTituloDoChat() {
   const index = getHistoryIndex();
   const atual = index.find((item) => item.sessionId === sessionId);
-
   if (chatTitle) {
     chatTitle.textContent = atual?.title || "Nova conversa";
   }
@@ -114,24 +138,20 @@ function salvarMensagemNoHistorico(role, content) {
 
   localStorage.setItem(key, JSON.stringify(mensagens));
 
-  let index = getHistoryIndex();
+  const index = getHistoryIndex();
   let existente = index.find((item) => item.sessionId === sessionId);
 
   const primeiraMensagemUsuario = mensagens.find((msg) => msg.role === "user");
-  const previewBase = primeiraMensagemUsuario?.content || mensagens[0]?.content || "Nova conversa";
-  const preview = previewBase.slice(0, 80);
   const title = primeiraMensagemUsuario ? normalizarTitulo(primeiraMensagemUsuario.content) : "Nova conversa";
 
   if (!existente) {
     index.unshift({
       sessionId,
       title,
-      preview,
       updatedAt: new Date().toISOString()
     });
   } else {
     existente.updatedAt = new Date().toISOString();
-    existente.preview = preview;
     existente.title = title;
   }
 
@@ -149,7 +169,6 @@ function carregarMensagensDaSessao(id) {
 
 function renderizarConversaSalva(id) {
   const mensagens = carregarMensagensDaSessao(id);
-
   if (!chat) return;
 
   chat.innerHTML = "";
@@ -185,7 +204,6 @@ function renderizarChatsRecentes() {
 
     btn.innerHTML = `
       <div class="recent-chat-title">${item.title}</div>
-      <div class="recent-chat-preview">${item.preview}</div>
     `;
 
     btn.addEventListener("click", () => {
@@ -199,27 +217,28 @@ function renderizarChatsRecentes() {
   });
 }
 
-function limparConversaAtual() {
+function excluirChatAtual() {
   localStorage.removeItem(getChatStorageKey(sessionId));
 
   const index = getHistoryIndex().filter((item) => item.sessionId !== sessionId);
   setHistoryIndex(index);
 
-  if (chat) {
-    chat.innerHTML = "";
+  if (index.length > 0) {
+    sessionId = index[0].sessionId;
+    localStorage.setItem("flyp_session_id", sessionId);
+    renderizarConversaSalva(sessionId);
+  } else {
+    sessionId = gerarSessionId();
+    localStorage.setItem("flyp_session_id", sessionId);
+    if (chat) chat.innerHTML = "";
+    atualizarTituloDoChat();
   }
 
-  const mensagemInicial =
-    "Olá! Eu sou o **Flyp**.\n\nPosso te ajudar com biologia, ciências, história, tecnologia e assuntos diversos. Pode perguntar.";
-
-  criarMensagem(mensagemInicial, "bot", true);
-  salvarMensagemNoHistorico("model", mensagemInicial);
-  fecharMenu();
+  renderizarChatsRecentes();
 }
 
 function exportarConversaAtual() {
   const mensagens = carregarMensagensDaSessao(sessionId);
-
   if (!mensagens.length) return;
 
   const texto = mensagens
@@ -252,10 +271,8 @@ function renderMarkdown(texto) {
       breaks: true,
       gfm: true
     });
-
     return DOMPurify.sanitize(bruto);
   }
-
   return texto;
 }
 
@@ -283,6 +300,14 @@ function criarMensagem(texto, tipo, usarMarkdown = false) {
 }
 
 async function digitarTextoMarkdown(elemento, texto, velocidade = 9) {
+  const animacoesLigadas = getAnimationsEnabled();
+
+  if (!animacoesLigadas) {
+    elemento.innerHTML = renderMarkdown(texto);
+    scrollChat();
+    return;
+  }
+
   let acumulado = "";
 
   for (let i = 0; i < texto.length; i++) {
@@ -308,7 +333,6 @@ function entrarNoChat() {
 
 function abrirMenu() {
   if (!sideMenu || !menuOverlay || !menuToggle) return;
-
   sideMenu.classList.add("open");
   menuOverlay.classList.add("open");
   menuToggle.classList.add("active");
@@ -316,7 +340,6 @@ function abrirMenu() {
 
 function fecharMenu() {
   if (!sideMenu || !menuOverlay || !menuToggle) return;
-
   sideMenu.classList.remove("open");
   menuOverlay.classList.remove("open");
   menuToggle.classList.remove("active");
@@ -324,7 +347,6 @@ function fecharMenu() {
 
 function abrirSobreFlyp() {
   if (!aboutOverlay || !aboutPanel) return;
-
   aboutOverlay.classList.add("open");
   aboutPanel.classList.add("open");
   fecharMenu();
@@ -332,9 +354,34 @@ function abrirSobreFlyp() {
 
 function fecharSobreFlypPanel() {
   if (!aboutOverlay || !aboutPanel) return;
-
   aboutOverlay.classList.remove("open");
   aboutPanel.classList.remove("open");
+}
+
+function abrirConfig() {
+  if (!configOverlay || !configPanel) return;
+  configOverlay.classList.add("open");
+  configPanel.classList.add("open");
+  fecharMenu();
+}
+
+function fecharConfig() {
+  if (!configOverlay || !configPanel) return;
+  configOverlay.classList.remove("open");
+  configPanel.classList.remove("open");
+}
+
+function abrirConfirmacaoExclusao() {
+  if (!confirmDeleteOverlay || !confirmDeletePanel) return;
+  confirmDeleteOverlay.classList.add("open");
+  confirmDeletePanel.classList.add("open");
+  fecharMenu();
+}
+
+function fecharConfirmacaoExclusao() {
+  if (!confirmDeleteOverlay || !confirmDeletePanel) return;
+  confirmDeleteOverlay.classList.remove("open");
+  confirmDeletePanel.classList.remove("open");
 }
 
 function mostrarPrismaEasterEgg() {
@@ -373,7 +420,6 @@ async function enviarMensagem() {
 
   input.value = "";
   input.focus();
-
   botao.disabled = true;
 
   const typingWrapper = document.createElement("div");
@@ -411,8 +457,7 @@ async function enviarMensagem() {
     }
 
     const textoResposta = dados.resposta || "Não consegui responder agora.";
-
-    await digitarTextoMarkdown(typingBubble, textoResposta, 8);
+    await digitarTextoMarkdown(typingBubble, textoResposta, getTypingSpeed());
     typingWrapper.classList.remove("typing");
     salvarMensagemNoHistorico("model", textoResposta);
     renderizarChatsRecentes();
@@ -427,7 +472,7 @@ async function enviarMensagem() {
   }
 }
 
-async function novaConversa() {
+function novaConversa() {
   sessionId = gerarSessionId();
   localStorage.setItem("flyp_session_id", sessionId);
 
@@ -435,24 +480,22 @@ async function novaConversa() {
     chat.innerHTML = "";
   }
 
-  const mensagemInicial =
-    "Olá! Eu sou o **Flyp**.\n\nPosso te ajudar com biologia, ciências, história, tecnologia e assuntos diversos. Pode perguntar.";
-
-  criarMensagem(mensagemInicial, "bot", true);
-  salvarMensagemNoHistorico("model", mensagemInicial);
+  atualizarTituloDoChat();
   renderizarChatsRecentes();
+}
 
-  try {
-    await fetch("/nova-conversa", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ sessionId }),
-    });
-  } catch (erro) {
-    console.error("Erro ao iniciar nova conversa:", erro);
-  }
+if (typingSpeedSelect) {
+  typingSpeedSelect.value = String(getTypingSpeed());
+  typingSpeedSelect.addEventListener("change", () => {
+    setTypingSpeed(Number(typingSpeedSelect.value));
+  });
+}
+
+if (animationsSelect) {
+  animationsSelect.value = getAnimationsEnabled() ? "on" : "off";
+  animationsSelect.addEventListener("change", () => {
+    setAnimationsEnabled(animationsSelect.value === "on");
+  });
 }
 
 if (chatForm) {
@@ -488,37 +531,31 @@ if (entrarBtn) {
 if (menuToggle) {
   menuToggle.addEventListener("click", () => {
     const aberto = sideMenu.classList.contains("open");
-
-    if (aberto) {
-      fecharMenu();
-    } else {
-      abrirMenu();
-    }
+    if (aberto) fecharMenu();
+    else abrirMenu();
   });
 }
 
-if (closeMenu) {
-  closeMenu.addEventListener("click", fecharMenu);
-}
+if (closeMenu) closeMenu.addEventListener("click", fecharMenu);
+if (menuOverlay) menuOverlay.addEventListener("click", fecharMenu);
 
-if (menuOverlay) {
-  menuOverlay.addEventListener("click", fecharMenu);
-}
+if (openAboutFlyp) openAboutFlyp.addEventListener("click", abrirSobreFlyp);
+if (closeAboutFlyp) closeAboutFlyp.addEventListener("click", fecharSobreFlypPanel);
+if (aboutOverlay) aboutOverlay.addEventListener("click", fecharSobreFlypPanel);
 
-if (openAboutFlyp) {
-  openAboutFlyp.addEventListener("click", abrirSobreFlyp);
-}
+if (openConfigPanel) openConfigPanel.addEventListener("click", abrirConfig);
+if (closeConfigPanel) closeConfigPanel.addEventListener("click", fecharConfig);
+if (configOverlay) configOverlay.addEventListener("click", fecharConfig);
 
-if (closeAboutFlyp) {
-  closeAboutFlyp.addEventListener("click", fecharSobreFlypPanel);
-}
+if (menuExcluirChat) menuExcluirChat.addEventListener("click", abrirConfirmacaoExclusao);
+if (cancelDeleteChat) cancelDeleteChat.addEventListener("click", fecharConfirmacaoExclusao);
+if (confirmDeleteOverlay) confirmDeleteOverlay.addEventListener("click", fecharConfirmacaoExclusao);
 
-if (aboutOverlay) {
-  aboutOverlay.addEventListener("click", fecharSobreFlypPanel);
-}
-
-if (menuLimparConversa) {
-  menuLimparConversa.addEventListener("click", limparConversaAtual);
+if (confirmDeleteChat) {
+  confirmDeleteChat.addEventListener("click", () => {
+    excluirChatAtual();
+    fecharConfirmacaoExclusao();
+  });
 }
 
 if (menuExportarConversa) {
@@ -529,7 +566,6 @@ themeButtons.forEach((btn) => {
   btn.addEventListener("click", () => {
     const tema = btn.dataset.theme;
     salvarTema(tema);
-    fecharMenu();
   });
 });
 
